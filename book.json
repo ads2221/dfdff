@@ -1,0 +1,31 @@
+{
+  "title": "DCA Tracker Bot - Руководство пользователя",
+  "description": "Полное руководство по использованию DCA Tracker Bot для отслеживания и управления торговлей на Solana",
+  "author": "DCA Tracker Team",
+  "language": "ru",
+  "gitbook": "3.2.2",
+  "root": ".",
+  "structure": {
+    "readme": "README.md",
+    "summary": "SUMMARY.md"
+  },
+  "plugins": [
+    "-lunr",
+    "search-plus"
+  ],
+  "pluginsConfig": {
+    "search-plus": {
+      "maxIndexSize": 1000000,
+      "uiOptions": {
+        "maxResults": 10,
+        "openOnFocus": false
+      }
+    },
+    "theme-default": {
+      "showLevel": true,
+      "styles": {
+        "website": "styles/website.css"
+      }
+    }
+  }
+}
