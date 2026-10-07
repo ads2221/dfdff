@@ -18,7 +18,7 @@ body{font-family:'Space Grotesk',Inter,sans-serif;color:#fff}
 .chip.red{border-color:var(--r);color:#fff;background:var(--r)}
 .chip.tg{border-color:var(--tg);color:#fff;background:var(--tg)}
 .big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.95;white-space:nowrap;text-align:center}
-#grain{position:absolute;inset:-100px;opacity:.07;mix-blend-mode:overlay;pointer-events:none}
+#grain{position:absolute;inset:-100px;opacity:.04;mix-blend-mode:overlay;pointer-events:none}
 #vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(0,0,0,.75) 100%)}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #prog{position:absolute;left:0;top:0;height:8px;background:linear-gradient(90deg,var(--y),var(--y2));box-shadow:0 0 20px var(--y)}
@@ -176,7 +176,8 @@ function S(el,o){
   el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) rotateX(${rx}deg) rotateY(${ry}deg) rotate(${r}deg) scale(${s})`;
   const op=o.o??1;el.style.opacity=op;
   el.style.filter=(o.b?`blur(${o.b}px)`:'')+(o.f||'');
-  el.style.display=op<=0.001?'none':'';
+  if(el.dataset.d===undefined)el.dataset.d=el.style.display==='none'?'':el.style.display;
+  el.style.display=((o.o??1)<=0.001)?'none':el.dataset.d;
 }
 const scenes=[['sA',0,2.35],['sB',2.15,58.45],['sC',58.25,68.55],['sD',68.4,74.6],['sE',74.45,DUR+1]];
 const CUTS=[2.23,6.3,24.92,28.3,34.47,40.46,44.52,53.64,58.33,68.52,74.53];

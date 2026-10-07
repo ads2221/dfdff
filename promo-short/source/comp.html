@@ -17,7 +17,7 @@ body{font-family:'Space Grotesk',Inter,sans-serif;color:#fff}
 .chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;letter-spacing:4px;padding:14px 26px;border:2px solid var(--y);color:var(--y);background:rgba(10,10,10,.85);border-radius:6px;white-space:nowrap}
 .chip.fill{background:var(--y);color:#111}
 .big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.95;white-space:nowrap;text-align:center}
-#grain{position:absolute;inset:-100px;opacity:.07;mix-blend-mode:overlay;pointer-events:none}
+#grain{position:absolute;inset:-100px;opacity:.04;mix-blend-mode:overlay;pointer-events:none}
 #vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(0,0,0,.75) 100%)}
 #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #prog{position:absolute;left:0;top:0;height:8px;background:linear-gradient(90deg,var(--y),var(--y2));box-shadow:0 0 20px var(--y)}
@@ -166,9 +166,10 @@ function S(el,o){
   el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg) rotate(${r}deg) scale(${s})`;
   el.style.opacity=o.o??1;
   el.style.filter=o.b?`blur(${o.b}px)`+(o.f||''):(o.f||'');
-  el.style.display=(o.o??1)<=0.001?'none':'';
+  if(el.dataset.d===undefined)el.dataset.d=el.style.display==='none'?'':el.style.display;
+  el.style.display=((o.o??1)<=0.001)?'none':el.dataset.d;
 }
-const hide=id=>{$(id).style.display='none'};
+const hide=id=>{const el=$(id);if(el.dataset.d===undefined)el.dataset.d=el.style.display;el.style.display='none'};
 const scenes=[['s1',0,4.85],['s2',4.75,10.45],['s3',10.3,16.65],['s4',16.5,27.95],['s5',27.8,34.25],['s6',34.1,41.55],['s7',41.4,47.8],['s8',47.65,DUR+1]];
 const CUTS=[4.8,10.37,16.57,27.88,34.17,41.47,47.72];
 const IMPACTS=[[0.05,26],[1.12,18],[4.8,30],[17.5,24],[26.45,22],[42.9,18],[47.72,24]];
