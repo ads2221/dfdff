@@ -1,0 +1,412 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{--pu:#9945FF;--gr:#19FB9B;--cy:#00C2FF;--pk:#FF4FD8;--bg:#04030c}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+body{font-family:'Space Grotesk',Inter,sans-serif;color:#fff}
+#bg{position:absolute;inset:0}
+#stage{position:absolute;inset:0;transform-origin:540px 900px}
+.abs{position:absolute;left:0;top:0;will-change:transform,opacity}
+.scene{position:absolute;inset:0;display:none;perspective:1800px}
+.mono{font-family:'JetBrains Mono',monospace}
+.big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.98;white-space:nowrap;text-align:center}
+.grad{background:linear-gradient(100deg,#B98CFF 0%,#9945FF 30%,#00C2FF 65%,#19FB9B 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1.5px solid rgba(255,255,255,.18);border-radius:34px;box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)}
+.gborder{position:relative;border-radius:30px;padding:4px;background:conic-gradient(from var(--a,0deg),#9945FF,#00C2FF,#19FB9B,#FF4FD8,#9945FF);box-shadow:0 0 70px rgba(153,69,255,.45),0 40px 120px rgba(0,0,0,.7)}
+.gborder>.in{border-radius:26px;overflow:hidden;background:#0b0a14}
+.gborder img{display:block;width:100%}
+.pill{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:30px;letter-spacing:5px;padding:16px 30px;border-radius:60px;white-space:nowrap;background:rgba(10,8,25,.65);border:1.5px solid rgba(255,255,255,.25);box-shadow:0 0 40px rgba(153,69,255,.35)}
+.pill.g{background:linear-gradient(90deg,#9945FF,#00C2FF 60%,#19FB9B);border:none;color:#05030f}
+#grain{position:absolute;inset:-100px;opacity:.03;mix-blend-mode:overlay;pointer-events:none}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 42%,transparent 50%,rgba(0,0,0,.7) 100%)}
+#flash{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(circle at 50% 45%,#fff,rgba(160,120,255,.6) 40%,rgba(0,0,0,0) 75%)}
+#sweep{position:absolute;left:-60%;top:-20%;width:40%;height:140%;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);transform:rotate(18deg);opacity:0;mix-blend-mode:screen}
+#prog{position:absolute;left:0;bottom:0;height:8px;background:linear-gradient(90deg,#9945FF,#00C2FF,#19FB9B);box-shadow:0 0 22px #9945FF}
+#caps{position:absolute;left:40px;right:40px;top:1560px;text-align:center;font-family:'Unbounded',sans-serif;font-weight:800;font-size:58px;line-height:1.3;text-transform:uppercase}
+#caps span{display:inline-block;margin:6px 6px;padding:4px 16px;border-radius:18px;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.9),0 0 2px #000}
+#caps span.on{background:linear-gradient(100deg,#9945FF,#00C2FF 60%,#19FB9B);color:#05030f;text-shadow:none;box-shadow:0 0 40px rgba(0,194,255,.55)}
+#badge{position:absolute;left:50%;top:64px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;font-weight:700;font-size:28px;letter-spacing:3px;padding:12px 28px;border-radius:40px;background:rgba(12,10,28,.55);border:1px solid rgba(255,255,255,.18);white-space:nowrap}
+.gdot{width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#9945FF,#19FB9B);box-shadow:0 0 16px #19FB9B}
+svg{overflow:visible}
+/* browser */
+#browser{width:1000px}
+#bBar{height:58px;display:flex;align-items:center;gap:12px;padding:0 22px;background:rgba(20,18,36,.95);border-radius:26px 26px 0 0}
+#bBar i{width:16px;height:16px;border-radius:50%;display:block}
+#bUrl{flex:1;margin-left:14px;height:36px;border-radius:18px;background:rgba(255,255,255,.08);font-family:'JetBrains Mono',monospace;font-size:20px;display:flex;align-items:center;padding-left:18px;color:#cfd}
+#bScreen{width:1000px;height:625px;position:relative;overflow:hidden;background:#0b0b0d;border-radius:0 0 26px 26px}
+#bScreen img{position:absolute;left:0;top:0;width:1000px}
+/* phone */
+.phone{width:520px;height:1060px;border-radius:76px;background:#0d0c16;padding:16px;box-shadow:0 0 0 3px #2f2b45,0 0 0 7px #0b0a12,0 50px 140px rgba(0,0,0,.8)}
+.phone .scr{width:488px;height:1028px;border-radius:60px;overflow:hidden;position:relative;background:#0e0e12}
+.phone .scr img{position:absolute;left:0;top:0;width:488px}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:130px;height:36px;border-radius:20px;background:#000;z-index:5}
+#cursor{width:56px;height:56px;z-index:50}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<linearGradient id="solg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#9945FF"/><stop offset=".55" stop-color="#00C2FF"/><stop offset="1" stop-color="#19FB9B"/></linearGradient>
+<radialGradient id="sg"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#C9B3FF"/><stop offset="1" stop-color="#19FB9B"/></radialGradient>
+<symbol id="plane" viewBox="0 0 24 24"><path fill="#fff" d="M21.5 3.6 2.9 10.8c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.8l3.2-15.2c.3-1.3-.5-1.9-1.9-1.5zM8.6 13.5l10.6-6.7c.5-.3 1-.1.6.2l-9.1 8.2-.4 3.8z"/></symbol>
+<symbol id="star4" viewBox="-110 -110 220 220"><path d="M0-105 C8-20 20-8 105 0 C20 8 8 20 0 105 C-8 20 -20 8 -105 0 C-20 -8 -8 -20 0 -105Z" fill="url(#sg)"/><circle r="11" fill="#19FB9B"/></symbol>
+<symbol id="whale" viewBox="0 0 64 44"><path d="M3 25c0-10 11-17 25-17 12 0 20 6 23 13l8-7c2-2 5-1 4 3l-3 9 3 9c1 3-2 5-4 3l-8-7c-3 6-12 10-23 10C13 41 3 35 3 25z" fill="#fff"/><circle cx="15" cy="22" r="2.4" fill="#2a0d5c"/><path d="M22 6c-1-3 2-5 4-2M27 6c1-3 4-3 4 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></symbol>
+<symbol id="bot" viewBox="0 0 100 100"><rect x="14" y="26" width="72" height="58" rx="18" fill="url(#solg)"/><rect x="26" y="40" width="48" height="26" rx="13" fill="#05030f"/><circle cx="40" cy="53" r="6" fill="#19FB9B"/><circle cx="60" cy="53" r="6" fill="#19FB9B"/><line x1="50" y1="26" x2="50" y2="12" stroke="#B98CFF" stroke-width="5"/><circle cx="50" cy="10" r="6" fill="#19FB9B"/><rect x="4" y="46" width="10" height="20" rx="5" fill="#9945FF"/><rect x="86" y="46" width="10" height="20" rx="5" fill="#19FB9B"/></symbol>
+</defs></svg>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<div id="stage">
+
+<!-- 1 HOOK -->
+<div class="scene" id="s1">
+  <div class="abs big" id="k1" style="font-size:150px">Киты</div>
+  <div class="abs big grad" id="k2" style="font-size:150px">Solana</div>
+  <div class="abs pill" id="k3" style="font-size:34px">КАЖДЫЙ ДЕНЬ · DCA-ОРДЕРА</div>
+  <svg class="abs" id="chart" width="1000" height="680" viewBox="0 0 1000 680"></svg>
+  <div class="abs" id="legend" style="display:flex;gap:40px;align-items:center;font-family:'JetBrains Mono';font-weight:700;font-size:30px;letter-spacing:3px">
+    <span style="display:flex;align-items:center;gap:14px"><i style="width:22px;height:22px;border-radius:50%;background:#9945FF;display:block;box-shadow:0 0 12px #9945FF"></i>КИТ</span>
+    <span style="display:flex;align-items:center;gap:14px"><i style="width:22px;height:22px;border-radius:50%;background:#19FB9B;display:block;box-shadow:0 0 12px #19FB9B"></i>ТВОЙ БОТ</span></div>
+  <div class="abs big" id="k4" style="font-size:96px">А что если…</div>
+  <div class="abs" id="botI"><svg width="200" height="200"><use href="#bot"/></svg></div>
+  <div class="abs pill g" id="k5" style="font-size:34px">АВТОМАТИЧЕСКИ · 24/7</div>
+</div>
+
+<!-- 2 BRAND -->
+<div class="scene" id="s2">
+  <div class="abs" id="bStar"><svg width="230" height="230"><use href="#star4"/></svg></div>
+  <div class="abs big" id="bName" style="font-size:96px;font-family:'Space Grotesk';font-weight:700;letter-spacing:-2px">DCA SOLANA <span class="grad">TRADE</span></div>
+  <div class="abs" id="lap"><div class="gborder" style="width:760px"><div class="in"><img src="assets4/desk_dashboard.png"></div></div></div>
+  <div class="abs" id="ph1"><div class="phone" style="transform:scale(.62);transform-origin:center"><div class="scr"><img src="assets4/theme_Violet.png"><div class="notch"></div></div></div></div>
+  <div class="abs pill g" id="oneW" style="font-size:30px;text-align:center;line-height:1.35">ОДНА ПЛАТФОРМА<br>ОДИН КОШЕЛЁК</div>
+  <div class="abs pill" id="lblWeb" style="font-size:26px">ВЕБ-ПАНЕЛЬ</div>
+  <div class="abs pill" id="lblTg" style="font-size:26px;display:flex;gap:14px;align-items:center"><svg width="28" height="28" style="flex:none"><use href="#plane"/></svg>TELEGRAM</div>
+</div>
+
+<!-- 3 WEB PANEL -->
+<div class="scene" id="s3">
+  <div class="abs pill" id="wHdr" style="font-size:32px">◆ ВЕБ-ПАНЕЛЬ</div>
+  <div class="abs" id="browser"><div class="gborder"><div class="in">
+    <div id="bBar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div id="bUrl">jupiter-dca-bot.online/panel</div></div>
+    <div id="bScreen"><img id="w0" src="assets4/desk_dashboard.png"><img id="w1" src="assets4/desk_orders-v3.png"><img id="w2" src="assets4/desk_dca-stats.png"></div>
+  </div></div></div>
+  <div class="abs" id="c0"><div class="gborder" style="width:700px"><div class="in"><img src="assets4/dash_top.png"></div></div></div>
+  <div class="abs" id="c1"><div class="gborder" style="width:780px"><div class="in"><img src="assets4/orders_card.png"></div></div></div>
+  <div class="abs" id="c2"><div class="gborder" style="width:860px"><div class="in"><img src="assets4/stats_chart.png"></div></div></div>
+  <div class="abs" id="c3"><div class="gborder" style="width:900px"><div class="in"><img src="assets4/lab_head.png"></div></div></div>
+  <div class="abs" id="c4"><div class="gborder" style="width:760px"><div class="in" style="height:900px;position:relative"><img id="labImg" src="assets4/lab_result.png" style="position:absolute;top:0"></div></div></div>
+  <div class="abs pill g" id="labTag" style="font-size:32px">ПРОВЕРКА НА ИСТОРИИ</div>
+  <div class="abs" id="t0"><div class="gborder" style="width:760px"><div class="in"><img src="assets4/filters_mcap.png"></div></div></div>
+  <div class="abs" id="t1"><div class="gborder" style="width:760px"><div class="in"><img src="assets4/tpsl.png"></div></div></div>
+  <div class="abs" id="t2"><div class="gborder" style="width:720px"><div class="in"><img src="assets4/blacklist.png"></div></div></div>
+  <div class="abs pill" id="tLbl" style="font-size:32px"></div>
+  <svg class="abs" id="cursor" viewBox="0 0 24 24"><path d="M3 2l7 19 2.5-7.5L20 11z" fill="#fff" stroke="#05030f" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  <div class="abs" id="ripple" style="width:120px;height:120px;border-radius:50%;border:5px solid #19FB9B"></div>
+</div>
+
+<!-- 4 TELEGRAM MINI APP -->
+<div class="scene" id="s4">
+  <div class="abs" id="tgIcon" style="width:150px;height:150px;border-radius:50%;background:linear-gradient(135deg,#37BBFE,#007DBB);display:flex;align-items:center;justify-content:center;box-shadow:0 0 90px rgba(42,171,238,.65)"><svg width="86" height="86"><use href="#plane"/></svg></div>
+  <div class="abs big" id="tgT" style="font-size:96px;color:#5cc8ff;text-shadow:0 0 50px rgba(42,171,238,.6)">Telegram</div>
+  <div class="abs pill" id="tgSub" style="font-size:30px">MINI APP · @dca_solana_trade_bot</div>
+  <div class="abs" id="ph2"><div class="phone"><div class="scr">
+    <img id="m0" src="assets4/theme_Amber.png"><img id="m1" src="assets4/trading_view.png"><img id="m2" src="assets4/stats_view.png"><img id="m3" src="assets4/filters_view.png">
+    <img id="m4" src="assets4/theme_Violet.png"><img id="m5" src="assets4/theme_Cyan.png"><img id="m6" src="assets4/theme_Emerald.png"><div class="notch"></div></div></div></div>
+  <div class="abs pill g" id="mLbl" style="font-size:34px"></div>
+</div>
+
+<!-- 5 STEPS -->
+<div class="scene" id="s5">
+  <div class="abs big grad" id="stT" style="font-size:96px">3 шага</div>
+  <div class="abs glass" id="st0" style="width:940px;height:300px;display:flex;align-items:center;gap:34px;padding:0 40px">
+    <div class="big grad" style="font-size:120px">01</div><div><div class="big" style="font-size:52px;text-align:left">Регистрация</div><div class="mono" style="font-size:30px;color:#19FB9B;margin-top:14px">БЕСПЛАТНО · МОНИТОРИНГ СРАЗУ</div></div></div>
+  <div class="abs glass" id="st1" style="width:940px;height:300px;display:flex;align-items:center;gap:34px;padding:0 40px">
+    <div class="big grad" style="font-size:120px">02</div><div><div class="big" style="font-size:52px;text-align:left">Пополнение</div><div class="mono" style="font-size:30px;color:#00C2FF;margin-top:14px">SOL ИЛИ USDC НА СВОЙ КОШЕЛЁК</div></div></div>
+  <div class="abs glass" id="st2" style="width:940px;height:300px;display:flex;align-items:center;gap:34px;padding:0 40px">
+    <div class="big grad" style="font-size:120px">03</div><div><div class="big" style="font-size:52px;text-align:left">Слот PRO</div><div class="mono" style="font-size:30px;color:#B98CFF;margin-top:14px">И БОТ НАЧИНАЕТ ТОРГОВАТЬ</div></div></div>
+  <div class="abs glass" id="toggle" style="width:600px;height:150px;border-radius:80px">
+    <div class="big" style="position:absolute;left:50px;top:46px;font-size:56px">Бот</div>
+    <div id="tgl" style="position:absolute;left:210px;top:31px;width:170px;height:88px;border-radius:50px;background:#2a2840"><div id="knob" style="position:absolute;top:8px;left:8px;width:72px;height:72px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.5)"></div></div>
+    <div class="big" id="tglTxt" style="position:absolute;left:420px;top:46px;font-size:56px;color:#888">OFF</div></div>
+</div>
+
+<!-- 6 PRICE -->
+<div class="scene" id="s6">
+  <div class="abs" id="p0"><div class="gborder" style="width:330px"><div class="in"><img src="assets4/slot1.png"></div></div></div>
+  <div class="abs" id="p1"><div class="gborder" style="width:330px"><div class="in"><img src="assets4/slot2.png"></div></div></div>
+  <div class="abs" id="p2"><div class="gborder" style="width:330px"><div class="in"><img src="assets4/slot3.png"></div></div></div>
+  <div class="abs" id="pFrom" style="text-align:center"><div class="big grad" style="font-size:140px">от $300</div><div class="mono" style="font-size:38px;font-weight:700;margin-top:16px;letter-spacing:4px">ПОДПИСКА НА 12 МЕСЯЦЕВ</div></div>
+  <div class="abs glass" id="pFee" style="display:flex;align-items:center;gap:30px;padding:26px 44px;border-radius:40px">
+    <div class="big grad" style="font-size:110px">20%</div><div class="mono" style="font-size:32px;line-height:1.35;font-weight:700">КОМИССИЯ ТОЛЬКО<br><span style="color:#19FB9B">С ПРИБЫЛЬНЫХ СДЕЛОК</span></div></div>
+</div>
+
+<!-- 7 CTA -->
+<div class="scene" id="s7">
+  <div class="abs" id="eStar"><svg width="200" height="200"><use href="#star4"/></svg></div>
+  <div class="abs big" id="eName" style="font-size:88px;font-family:'Space Grotesk';font-weight:700;letter-spacing:-2px">DCA SOLANA <span class="grad">TRADE</span></div>
+  <div class="abs" id="eBtn" style="padding:40px 80px;border-radius:80px;background:linear-gradient(90deg,#9945FF,#00C2FF 60%,#19FB9B)"><div class="big" style="font-size:66px;color:#05030f">Начни бесплатно</div></div>
+  <div class="abs pill" id="eWeb" style="font-size:36px;display:flex;gap:20px;align-items:center"><svg width="38" height="38" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="10" fill="none" stroke="#19FB9B" stroke-width="2"/><path d="M2 12h20M12 2c3 3 4 6.5 4 10s-1 7-4 10c-3-3-4-6.5-4-10s1-7 4-10z" fill="none" stroke="#19FB9B" stroke-width="2"/></svg>jupiter-dca-bot.online</div>
+  <div class="abs pill" id="eTg" style="font-size:36px;display:flex;gap:20px;align-items:center"><svg width="38" height="38" style="flex:none"><use href="#plane"/></svg>@dca_solana_trade_bot</div>
+  <div class="abs mono" id="eLink" style="font-size:34px;letter-spacing:6px;color:#cbb8ff">ССЫЛКИ В ОПИСАНИИ ↓</div>
+  <div class="abs glass" id="eWarn" style="width:900px;display:flex;gap:24px;align-items:center;padding:26px 34px;border-radius:26px;border-color:rgba(255,79,120,.5)">
+    <svg width="64" height="64" viewBox="0 0 24 24" style="flex:none"><path d="M12 2 1 21h22L12 2z" fill="none" stroke="#FF4F78" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v5" stroke="#FF4F78" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.3" fill="#FF4F78"/></svg>
+    <div style="font-size:34px;line-height:1.3"><b>Крипта — это риск.</b><br><span style="color:#bbb">Не финансовый совет · DYOR</span></div>
+  </div>
+</div>
+
+</div><!-- stage -->
+<div id="caps"></div>
+<div id="badge"><span class="gdot"></span><span>DCA SOLANA TRADE</span></div>
+<canvas id="grain" width="640" height="1140"></canvas>
+<div id="vig"></div>
+<div id="sweep"></div>
+<div id="flash"></div>
+<div id="prog"></div>
+
+<script src="words4.js"></script>
+<script>
+const W=1080,H=1920,DUR=71.0;
+const $=id=>document.getElementById(id);
+const C=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const P=(t,a,b)=>C((t-a)/(b-a));
+const L=(a,b,x)=>a+(b-a)*x;
+const E={o3:x=>1-Math.pow(1-x,3),o5:x=>1-Math.pow(1-x,5),expo:x=>x>=1?1:1-Math.pow(2,-10*x),
+ back:x=>{const c=1.7,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)},
+ io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,i3:x=>x*x*x,
+ el:x=>x===0?0:x===1?1:Math.pow(2,-10*x)*Math.sin((x*10-.75)*(2*Math.PI)/3)+1};
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function S(el,o){
+  if(typeof el==='string')el=$(el);
+  const x=o.x??540,y=o.y??960,s=o.s??1,r=o.r??0,rx=o.rx??0,ry=o.ry??0;
+  el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) rotateX(${rx}deg) rotateY(${ry}deg) rotate(${r}deg) scale(${s})`;
+  const op=o.o??1;el.style.opacity=op;
+  el.style.filter=(o.b?`blur(${o.b}px)`:'')+(o.f||'');
+  if(el.dataset.d===undefined)el.dataset.d=el.style.display==='none'?'':el.style.display;
+  el.style.display=op<=0.001?'none':el.dataset.d;
+}
+const scenes=[['s1',0,9.05],['s2',8.85,15.45],['s3',15.25,39.7],['s4',39.5,46.35],['s5',46.1,56.95],['s6',56.7,62.85],['s7',62.6,DUR+1]];
+const CUTS=[8.92,15.36,20.04,22.19,24.43,31.2,39.59,46.21,56.8,62.74];
+const WARP=[[8.92,1.2],[15.36,.8],[39.59,1.0],[46.21,.7],[62.74,1.1]];
+const IMPACTS=[[0.1,18],[0.46,22],[5.06,14],[8.92,24],[39.59,18],[55.39,20],[59.92,18],[62.74,16]];
+
+// ---------- background: nebula + warp starfield + orbit rings + aurora ----------
+const bg=$('bg').getContext('2d');
+const R=rng(42);
+const STARS=[...Array(420)].map(()=>({x:(R()-.5)*2,y:(R()-.5)*2,z:R(),c:R()}));
+const DUST=[...Array(60)].map(()=>({x:R()*W,y:R()*H,r:1+R()*2.5,ph:R()*6,sp:.2+R()*.6}));
+function warpAmt(t){let w=0;for(const [a,amp] of WARP){const d=t-a;if(d>-.35&&d<.9)w=Math.max(w,amp*(d<0?E.i3(P(d,-.35,0)):Math.exp(-d*4)))}return w}
+let zoff=0,lastT=0;
+function drawBG(t){
+  bg.globalCompositeOperation='source-over';
+  bg.fillStyle='#04030c';bg.fillRect(0,0,W,H);
+  bg.globalCompositeOperation='lighter';
+  const neb=(x,y,r,c,a)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);bg.fillStyle=g;bg.fillRect(x-r,y-r,2*r,2*r)};
+  neb(300+180*Math.sin(t*.21),520+140*Math.cos(t*.17),820,'153,69,255',.30);
+  neb(820+160*Math.cos(t*.19),1180+170*Math.sin(t*.23),860,'0,194,255',.20);
+  neb(560+260*Math.sin(t*.13+2),1550+90*Math.cos(t*.31),700,'25,251,155',.14);
+  neb(900+120*Math.sin(t*.27),330,520,'255,79,216',.10);
+  // stars (deterministic z by time)
+  const w=warpAmt(t);const speed=.06+w*1.6;
+  const cx=540,cy=880;
+  for(const s of STARS){
+    const z=((s.z-t*speed*.25-(w>0?0:0))%1+1)%1;
+    // integrate warp: offset based on time
+    const zz=((s.z - t*.015 - warpInt(t)*.35)%1+1)%1;
+    const k=1/(zz*1.6+.08);
+    const x=cx+s.x*420*k,y=cy+s.y*420*k;
+    if(x<-50||x>W+50||y<-50||y>H+50)continue;
+    const a=C((1-zz)*1.2)*(.4+.6*s.c);
+    if(w>.05){const k2=1/((zz+.05*w)*1.6+.08);const x2=cx+s.x*420*k2,y2=cy+s.y*420*k2;
+      bg.strokeStyle=s.c>.5?`rgba(190,160,255,${a})`:`rgba(140,240,255,${a})`;bg.lineWidth=1+2*(1-zz);bg.beginPath();bg.moveTo(x,y);bg.lineTo(x2,y2);bg.stroke();}
+    else{bg.fillStyle=s.c>.7?`rgba(200,180,255,${a})`:`rgba(220,240,255,${a})`;const r=.6+1.8*(1-zz);bg.fillRect(x-r/2,y-r/2,r,r)}
+  }
+  // orbit rings (planet) bottom
+  bg.save();bg.translate(540,1720);bg.rotate(-.12);
+  for(let i=0;i<4;i++){const rx=520+i*130,ry=90+i*26;bg.strokeStyle=`rgba(${i%2?'0,194,255':'153,69,255'},${.22-i*.04})`;bg.lineWidth=2;bg.beginPath();bg.ellipse(0,0,rx,ry,0,0,Math.PI*2);bg.stroke();
+    const a=t*(.35-i*.06)+i*1.7;bg.fillStyle='rgba(25,251,155,.9)';bg.beginPath();bg.arc(Math.cos(a)*rx,Math.sin(a)*ry,4+i,0,7);bg.fill();}
+  bg.restore();
+  // planet glow horizon
+  const hg=bg.createRadialGradient(540,2350,300,540,2350,900);hg.addColorStop(0,'rgba(153,69,255,.0)');hg.addColorStop(.62,'rgba(153,69,255,.0)');hg.addColorStop(.7,'rgba(120,90,255,.35)');hg.addColorStop(.74,'rgba(0,194,255,.18)');hg.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=hg;bg.fillRect(0,1300,W,620);
+  // aurora waves
+  for(let k=0;k<3;k++){bg.beginPath();for(let x=0;x<=W;x+=12){const y=1380+k*40+Math.sin(x*.006+t*(.7+k*.2)+k)*38+Math.sin(x*.017-t*.9)*14;x?bg.lineTo(x,y):bg.moveTo(x,y)}
+    bg.strokeStyle=['rgba(153,69,255,.28)','rgba(0,194,255,.22)','rgba(25,251,155,.18)'][k];bg.lineWidth=3;bg.stroke()}
+  for(const d of DUST){const y=((d.y-t*30*d.sp)%H+H)%H;bg.fillStyle=`rgba(200,190,255,${.25+.25*Math.sin(t*2+d.ph)})`;bg.beginPath();bg.arc(d.x+Math.sin(t*.5+d.ph)*30,y,d.r,0,7);bg.fill()}
+  bg.globalCompositeOperation='source-over';
+}
+// integral of warp speed (numeric, cheap)
+function warpInt(t){let s=0;for(const [a,amp] of WARP){if(t<a-.35)continue;
+  // pre ramp
+  const d1=Math.min(t,a)-(a-.35);s+=amp*d1*.25;
+  if(t>a){s+=amp*(1-Math.exp(-(t-a)*4))/4}}return s}
+const gr=$('grain').getContext('2d'),gimgs=[];
+for(let k=0;k<4;k++){const r=rng(100+k),d=gr.createImageData(640,1140);for(let i=0;i<d.data.length;i+=4){const v=r()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}gimgs.push(d)}
+
+// ---------- captions ----------
+const WORDS=window.WORDS;const groups=[];{let g=[];WORDS.forEach((w)=>{g.push(w);const long=g.map(x=>x.w).join(' ').length;if(/[.!?,:;]/.test(w.p)||g.length>=3||long>15){groups.push(g);g=[]}});if(g.length)groups.push(g)}
+groups.forEach((g,i)=>{g.start=g[0].s;g.end=i<groups.length-1?Math.min(groups[i+1][0].s,g[g.length-1].e+0.6):g[g.length-1].e+1.2});
+const capsEl=$('caps');let lastG=null;
+function drawCaps(t){
+  if(t<0.05||t>=66.7){capsEl.style.opacity=0;return}
+  const g=groups.find(g=>t>=g.start&&t<g.end);
+  if(!g){capsEl.style.opacity=0;return}
+  if(g!==lastG){capsEl.innerHTML=g.map(w=>`<span>${w.w}</span>`).join('');lastG=g}
+  capsEl.style.opacity=1;
+  const k=E.o5(P(t,g.start,g.start+.25));
+  capsEl.style.transform=`translateY(${(1-k)*30}px)`;capsEl.style.filter=`blur(${(1-k)*8}px)`;
+  [...capsEl.children].forEach((sp,i)=>{const w=g[i];const on=t>=w.s-0.03;const act=on&&(i===g.length-1||t<g[i+1].s);
+    sp.className=act?'on':'';const kk=E.back(P(t,w.s-.03,w.s+.18));sp.style.transform=`scale(${act?L(.9,1.06,kk):1})`;sp.style.opacity=on?1:.4});
+}
+
+// ---------- scene 1 ----------
+// DCA chart: whale line with periodic BUY markers; bot line copies with delay
+const WH=[...Array(40)].map((_,i)=>{const r=rng(9+i)();return 560-i*11+Math.sin(i*.9)*26+(r-.5)*20});
+const CX=i=>60+i*22.5;
+function chartSVG(t){
+  const pw=E.io(P(t,1.6,3.8)),pb=E.io(P(t,5.7,7.9));
+  const pts=(prog,dy)=>{const n=Math.max(2,Math.floor(WH.length*prog));return WH.slice(0,n).map((y,i)=>`${CX(i)},${y+dy}`).join(' ')};
+  let h=`<polyline points="${pts(pw,0)}" fill="none" stroke="#B98CFF" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 12px #9945FF)"/>`;
+  if(pb>0)h+=`<polyline points="${pts(pb,46)}" fill="none" stroke="#19FB9B" stroke-width="7" stroke-dasharray="16 12" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 12px #19FB9B)"/>`;
+  for(let i=5;i<36;i+=6){const a=i/40;
+    if(pw>=a){const k=E.back(P(t,1.6+a*2.2,1.6+a*2.2+.3));h+=`<g transform="translate(${CX(i)},${WH[i]}) scale(${k})"><circle r="15" fill="#9945FF" stroke="#fff" stroke-width="3"/><g transform="translate(0,-46)"><rect x="-38" y="-19" width="76" height="38" rx="19" fill="rgba(153,69,255,.9)"/><text y="8" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="21" fill="#fff">BUY</text></g></g>`}
+    if(pb>=a){const k=E.back(P(t,5.7+a*2.2,5.7+a*2.2+.3));h+=`<g transform="translate(${CX(i)},${WH[i]+46}) scale(${k})"><circle r="12" fill="#19FB9B" stroke="#05030f" stroke-width="3"/></g>`}}
+  const head=(prog,dy,sym,col,bgc)=>{const n=Math.max(1,Math.floor(40*prog))-1;const k=E.back(C(prog*6));return `<g transform="translate(${CX(n)+52},${WH[n]+dy}) scale(${k})"><circle r="40" fill="${bgc}" stroke="${col}" stroke-width="4" style="filter:drop-shadow(0 0 16px ${col})"/><use href="#${sym}" x="-26" y="-${sym==='whale'?18:26}" width="52" height="${sym==='whale'?36:52}"/></g>`};
+  if(pw>0.02)h+=head(pw,0,'whale','#B98CFF','#2a1259');
+  if(pb>0.02)h+=head(pb,46,'bot','#19FB9B','#062a20');
+  return h;
+}
+function s1(t){
+  const pop=(id,t0,y,from=2.4)=>{const k=E.expo(P(t,t0,t0+.32));return {y,s:L(from,1,k),o:P(t,t0,t0+.08),b:(1-k)*16}};
+  const up=E.io(P(t,1.5,2.0));const out1=E.io(P(t,3.85,4.2));
+  S('k1',{...pop('k1',0.1,L(760,300,up)),y:L(760,300,up)-out1*600,s:L(2.4,1,E.expo(P(t,.1,.42)))*L(1,.6,up)});
+  S('k2',{y:L(920,410,up)-out1*600,s:L(2.4,1,E.expo(P(t,.46,.8)))*L(1,.6,up),o:P(t,.46,.54)});
+  S('k3',{y:L(1080,520,up)-out1*600,s:E.back(P(t,1.02,1.4)),o:P(t,1.02,1.08)});
+  $('chart').innerHTML=chartSVG(t);
+  S('chart',{y:1010,o:P(t,1.55,1.7)*(1-P(t,8.6,8.9)),s:1});
+  S('legend',{y:1400,o:P(t,5.8,6.1)*(1-P(t,8.6,8.9))});
+  const k4=E.expo(P(t,4.02,4.35));const o4=E.io(P(t,4.9,5.3));
+  S('k4',{y:L(860,230,o4),s:L(2,1,k4)*L(1,.7,o4),o:P(t,4.02,4.1)*(1-P(t,6.6,6.8))});
+  const kb=E.el(P(t,5.06,5.8));
+  S('botI',{x:540,y:L(560,700,E.io(P(t,5.55,5.85))),s:kb*L(1,.35,E.io(P(t,5.55,5.85))),r:Math.sin(t*3)*5,o:P(t,5.06,5.1)*(1-P(t,5.7,5.85))});
+  S('k5',{y:330,s:E.back(P(t,6.73,7.1)),o:P(t,6.73,6.8)*(1-P(t,8.6,8.9))});
+}
+// ---------- scene 2 ----------
+function s2(t){
+  const k=E.back(P(t,8.92,9.5)),up=E.io(P(t,10.9,11.5));
+  S('bStar',{y:L(700,250,up),s:k*L(1.2,.55,up),r:t*40,o:P(t,8.92,9.0)});
+  S('bName',{y:L(920,420,up),s:L(.6,1,E.expo(P(t,9.74,10.2)))*L(1,.75,up),o:P(t,9.74,9.82),f:` drop-shadow(0 0 30px rgba(153,69,255,.5))`});
+  const kl=E.o5(P(t,11.46,12.1)),kp=E.o5(P(t,12.3,12.9));
+  document.querySelectorAll('.gborder').forEach(e=>e.style.setProperty('--a',(t*60)+'deg'));
+  S('lap',{x:L(-400,420,kl),y:760,ry:14,rx:4,s:.84,o:P(t,11.46,11.55)});
+  S('ph1',{x:L(1500,830,kp),y:1000,ry:-12,s:1,o:P(t,12.3,12.4)});
+  S('lblWeb',{x:330,y:1020,s:E.back(P(t,11.9,12.2)),o:P(t,11.9,11.95)});
+  S('lblTg',{x:830,y:1385,s:E.back(P(t,12.8,13.1)),o:P(t,12.8,12.85)});
+  S('oneW',{x:400,y:1220,s:E.back(P(t,14.2,14.6)),o:P(t,14.2,14.26)});
+  const e=P(t,15.2,15.45);$('s2').style.opacity=1-e;
+}
+// ---------- scene 3 ----------
+const WSHOTS=[[15.36,20.04],[20.04,22.19],[22.19,24.43]];
+const CALL=[['c0',17.25,20.0],['c1',20.4,22.15],['c2',22.5,24.4],['c3',24.43,26.4],['c4',26.4,31.1]];
+const TOOLS=[['t0',31.2,'ФИЛЬТРЫ'],['t1',33.87,'TAKE-PROFIT / STOP-LOSS'],['t2',35.67,'ЧЁРНЫЙ СПИСОК']];
+function s3(t){
+  document.querySelectorAll('.gborder').forEach(e=>e.style.setProperty('--a',(t*60)+'deg'));
+  const sec=t>=33.77&&t<35.57?'TAKE-PROFIT / STOP-LOSS':t>=35.57?'ЧЁРНЫЙ СПИСОК':t>=31.1?'ФИЛЬТРЫ':t>=24.43?'ЛАБОРАТОРИЯ ФИЛЬТРОВ':t>=22.19?'СТАТИСТИКА':t>=20.04?'МОНИТОРИНГ DCA':'ДАШБОРД';
+  $('wHdr').innerHTML='<span style="color:#19FB9B">◆</span>&nbsp; ВЕБ-ПАНЕЛЬ &nbsp;·&nbsp; <span style="color:#B98CFF">'+sec+'</span>';
+  S('wHdr',{y:230,s:E.back(P(t,15.4,15.8)),o:P(t,15.4,15.45)*(1-P(t,39.3,39.6))});
+  // browser in/out
+  const kin=E.o5(P(t,15.36,16.1)),kout=E.io(P(t,24.3,24.8));
+  let act=0;for(const [,a,b] of CALL){act=Math.max(act,Math.min(E.o3(P(t,a,a+.3)),1-E.o3(P(t,b-.25,b))))}
+  S('browser',{y:L(1500,700,kin)-kout*200+act*-60,s:L(.7,.98,kin)*(1-act*.12)*(1-kout*.2),rx:L(35,6,kin)+Math.sin(t*.7)*2,ry:Math.sin(t*.5)*4,o:P(t,15.36,15.45)*(1-kout),f:` brightness(${1-act*.4})`});
+  WSHOTS.forEach(([a,b],i)=>{const el=$('w'+i);const k=E.o5(P(t,a,a+.5));const vis=t>=a-.01&&t<(WSHOTS[i+1]?WSHOTS[i+1][0]+.5:99);el.style.display=vis?'':'none';
+    el.style.opacity=i?k:1;el.style.transform=`translateY(${-E.io(P(t,a+.6,b))*(i===1?160:i===2?120:60)}px) scale(${1+.04*(1-k)})`;el.style.zIndex=i});
+  CALL.forEach(([id,a,b])=>{
+    if(!(t>=a&&t<b)){$(id).style.display='none';return}
+    const ki=E.back(P(t,a,a+.5)),ko=E.i3(P(t,b-.3,b));
+    S(id,{y:L(1500,id==='c4'?900:1040,ki)-ko*100,s:L(.6,1,ki)*(1-ko*.15),rx:L(-30,0,ki),ry:Math.sin(t*.9)*4,o:P(t,a,a+.08)*(1-ko)});
+  });
+  $('labImg').style.transform=`translateY(${-E.io(P(t,27.0,30.6))*1200}px)`;
+  S('labTag',{y:1440,s:E.back(P(t,26.6,27.0)),o:P(t,26.6,26.65)*(1-P(t,30.85,31.1))});
+  // tools: 3D carousel
+  let cur=-1;TOOLS.forEach(([,a],i)=>{if(t>=a-.1)cur=i});
+  TOOLS.forEach(([id,a],i)=>{
+    if(t<a-.2||t>39.65){$(id).style.display='none';return}
+    const k=E.o5(P(t,a-.2,a+.35));
+    let ang=0;TOOLS.forEach(([,b],j)=>{if(j>i)ang+=E.io(P(t,b-.2,b+.35))});
+    const out=E.i3(P(t,39.2,39.6));
+    const th=ang*38;
+    S(id,{x:540-ang*170+(1-k)*700,y:880-ang*90-out*1300,s:(1-ang*.14)*L(.7,1,k),ry:ang*22+(1-k)*-50,o:P(t,a-.2,a-.12)*C(1-ang*.55),f:ang<.5?'':` brightness(${1-ang*.35})`});
+    $(id).style.zIndex=10+i;
+  });
+  hideEl('tLbl');
+  // cursor click "в пару кликов"
+  const cIn=P(t,37.3,37.9);
+  if(t>37.2&&t<39.4){const x=L(980,640,E.io(cIn)),y=L(1400,980,E.io(cIn));S('cursor',{x,y,s:t>38.6&&t<38.8?.85:1});
+    const rk=P(t,38.6,39.2);S('ripple',{x:628,y:968,s:L(.2,2,E.o3(rk)),o:rk>0?1-rk:0})}else{hideEl('cursor');hideEl('ripple')}
+}
+function hideEl(id){const el=$(id);if(el.dataset.d===undefined)el.dataset.d=el.style.display;el.style.display='none'}
+// ---------- scene 4 ----------
+const MSHOTS=[['m0',39.6,'ГЛАВНАЯ'],['m0',42.49,'БАЛАНС'],['m1',43.05,'ТОРГОВЛЯ'],['m2',43.78,'СТАТИСТИКА'],['m3',44.77,'ФИЛЬТРЫ'],['m4',45.5,'ТЕМЫ'],['m5',45.75,'ТЕМЫ'],['m6',46.0,'ТЕМЫ']];
+function s4(t){
+  const ki=E.back(P(t,39.6,40.1)),up=E.io(P(t,41.0,41.6));
+  S('tgIcon',{x:L(540,215,up),y:L(640,250,up),s:ki*L(1,.62,up),r:L(-40,0,ki),o:P(t,39.6,39.65)});
+  S('tgT',{x:L(540,600,up),y:L(840,252,up),s:L(.5,1,E.expo(P(t,41.0,41.4)))*L(1,.75,up),o:P(t,41.0,41.05)});
+  S('tgSub',{y:L(980,370,up),s:E.back(P(t,40.4,40.8))*L(1,.85,up),o:P(t,40.4,40.45)});
+  const kp=E.o5(P(t,41.2,41.9));
+  S('ph2',{y:L(2100,980,kp)-E.i3(P(t,46.0,46.3))*1400,ry:Math.sin(t*1.2)*10,rx:L(30,4,kp),s:.95,o:1});
+  let cur=0;MSHOTS.forEach(([,a],i)=>{if(t>=a)cur=i});
+  const ids=['m0','m1','m2','m3','m4','m5','m6'];const curId=MSHOTS[cur][0];
+  ids.forEach(id=>{const el=$(id);el.style.display=id===curId?'':'none'});
+  const a=MSHOTS[cur][1];const ks=E.o5(P(t,a,a+.3));$(curId).style.transform=`translateX(${(1-ks)*(cur>4?0:120)}px)`;$(curId).style.opacity=cur>0?ks:1;
+  const glow=['#F5B400','#F5B400','#19FB9B','#00C2FF','#B98CFF','#9945FF','#00C2FF','#19FB9B'][cur];
+  $('ph2').firstElementChild.style.boxShadow=`0 0 0 3px #2f2b45,0 0 0 7px #0b0a12,0 50px 140px rgba(0,0,0,.8),0 0 120px ${glow}88`;
+  $('mLbl').textContent=MSHOTS[cur][2];
+  S('mLbl',{y:1500-80,s:E.back(P(t,a,a+.3)),o:t>42.4?1-P(t,46.0,46.25):0});
+}
+// ---------- scene 5 ----------
+function s5(t){
+  S('stT',{y:L(500,250,E.io(P(t,46.9,47.4))),s:E.back(P(t,46.21,46.7))*L(1.2,.8,E.io(P(t,46.9,47.4))),o:P(t,46.21,46.3)*(1-P(t,56.6,56.9))});
+  [[47.81,560],[50.76,900],[53.84,1240]].forEach(([a,y],i)=>{const k=E.o5(P(t,a-.15,a+.45));S('st'+i,{x:L(1500,540,k),y,rx:0,ry:L(-60,0,k),s:1,o:P(t,a-.15,a-.05)*(1-P(t,55.1,55.4)),f:(t>=a&&t<([50.76,53.84,55.1][i]))?' drop-shadow(0 0 40px rgba(0,194,255,.6))':''})});
+  const kt=E.back(P(t,55.2,55.6));const on=E.io(P(t,55.39,55.7));
+  S('toggle',{y:880,s:kt*(1+.03*Math.sin(t*6)),o:P(t,55.2,55.25)*(1-P(t,56.6,56.9))});
+  $('knob').style.left=L(8,90,on)+'px';$('tgl').style.background=on>.5?'linear-gradient(90deg,#9945FF,#19FB9B)':'#2a2840';
+  $('tglTxt').textContent=on>.5?'ON':'OFF';$('tglTxt').style.color=on>.5?'#19FB9B':'#888';
+}
+// ---------- scene 6 ----------
+function s6(t){
+  document.querySelectorAll('.gborder').forEach(e=>e.style.setProperty('--a',(t*60)+'deg'));
+  [['p0',56.8,200,-10],['p1',57.0,540,0],['p2',57.2,880,10]].forEach(([id,a,x,r])=>{const k=E.back(P(t,a,a+.5));S(id,{x,y:L(1500,620,k),r:r*k,s:1,o:P(t,a,a+.06)*(1-P(t,62.5,62.8))})});
+  S('pFrom',{y:1020,s:E.el(P(t,57.3,58.0)),o:P(t,57.3,57.35)*(1-P(t,62.5,62.8))});
+  S('pFee',{y:1330,s:E.back(P(t,59.2,59.6)),o:P(t,59.2,59.25)*(1-P(t,62.5,62.8))});
+}
+// ---------- scene 7 ----------
+function s7(t){
+  const k=E.back(P(t,62.74,63.3));
+  S('eStar',{y:330,s:k,r:t*30,o:P(t,62.74,62.8)});
+  S('eName',{y:520,s:L(.6,.95,E.expo(P(t,62.9,63.3))),o:P(t,62.9,62.96)});
+  S('eBtn',{y:760,s:E.el(P(t,65.19,65.9))*(1+.035*Math.sin(t*7)),o:P(t,65.19,65.24),f:` drop-shadow(0 0 ${40+20*Math.sin(t*7)}px rgba(0,194,255,.7))`});
+  S('eWeb',{y:960,s:E.back(P(t,63.3,63.7)),o:P(t,63.3,63.35)});
+  S('eTg',{y:1070,s:E.back(P(t,63.5,63.9)),o:P(t,63.5,63.55)});
+  S('eLink',{y:1190+Math.abs(Math.sin(t*4))*10,o:P(t,63.9,64.2)});
+  S('eWarn',{y:L(1800,1480,E.o5(P(t,66.78,67.3))),o:P(t,66.78,66.9)});
+}
+const RF={s1,s2,s3,s4,s5,s6,s7};
+function renderAt(t){
+  drawBG(t);
+  for(const [id,a,b] of scenes){const el=$(id);if(t>=a&&t<b){el.style.display='block';RF[id](t)}else el.style.display='none'}
+  let sx=0,sy=0,sc=1;
+  for(const [ti,amp] of IMPACTS){const d=t-ti;if(d>=0&&d<.6){const e=Math.exp(-d*9);sx+=amp*e*Math.sin(d*90);sy+=amp*e*Math.cos(d*77);sc+=.04*e}}
+  const w=warpAmt(t);sc+=w*.06;
+  const st=$('stage');st.style.transform=`translate(${sx}px,${sy}px) rotate(${Math.sin(t*.6)*.35}deg) scale(${sc+0.01*Math.sin(t*.8)})`;
+  st.style.filter=w>.3?`blur(${(w-.3)*6}px)`:'';
+  let fl=0;for(const c of CUTS){const d=t-c;if(d>=-.04&&d<.35)fl=Math.max(fl,.55*Math.exp(-Math.max(0,d)*11))}
+  $('flash').style.opacity=fl;
+  // light sweep after cuts
+  let sw=-1;for(const c of CUTS){const d=t-c;if(d>=0&&d<.7)sw=d/.7}
+  const swe=$('sweep');if(sw>=0){swe.style.opacity=.9;swe.style.left=L(-60,140,E.io(sw))+'%'}else swe.style.opacity=0;
+  drawCaps(t);
+  $('badge').style.opacity=C(P(t,9.6,10.0)-P(t,62.4,62.7));
+  $('prog').style.width=(t/DUR*100)+'%';
+  gr.putImageData(gimgs[Math.floor(t*30)%4],0,0);
+  $('grain').style.transform=`translate(${(Math.floor(t*30)*37)%100}px,${(Math.floor(t*30)*53)%100}px) scale(2)`;
+  document.body.style.opacity=1-P(t,DUR-0.5,DUR);
+}
+window.renderAt=renderAt;window.DUR=DUR;
+Promise.all([document.fonts.ready,...[...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r}))]).then(()=>{window.READY=true});
+</script>
+</body></html>

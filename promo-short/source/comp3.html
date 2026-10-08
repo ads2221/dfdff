@@ -1,0 +1,350 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{--y:#F5B400;--y2:#FFD34D;--p:#7B5CFF;--g:#22D37A;--r:#FF3B5C;--tg:#2AABEE;--bg:#08080a}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--bg)}
+body{font-family:'Space Grotesk',Inter,sans-serif;color:#fff}
+#bg{position:absolute;inset:0}
+#stage{position:absolute;inset:0;transform-origin:540px 900px}
+.abs{position:absolute;left:0;top:0;will-change:transform,opacity}
+.scene{position:absolute;inset:0;display:none;perspective:1700px}
+.mono{font-family:'JetBrains Mono',monospace}
+.card{border-radius:26px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.75),0 0 0 2px rgba(245,180,0,.3)}
+.card img{display:block;width:100%}
+.chip{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:32px;letter-spacing:4px;padding:14px 28px;border:2px solid var(--y);color:var(--y);background:rgba(10,10,10,.88);border-radius:8px;white-space:nowrap}
+.chip.fill{background:var(--y);color:#111}
+.chip.red{border-color:var(--r);color:#fff;background:var(--r)}
+.chip.tg{border-color:var(--tg);color:#fff;background:var(--tg)}
+.big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.95;white-space:nowrap;text-align:center}
+#grain{position:absolute;inset:-100px;opacity:.04;mix-blend-mode:overlay;pointer-events:none}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 45%,rgba(0,0,0,.75) 100%)}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#prog{position:absolute;left:0;top:0;height:8px;background:linear-gradient(90deg,var(--y),var(--y2));box-shadow:0 0 20px var(--y)}
+#caps{position:absolute;left:50px;right:50px;top:1540px;text-align:center;font-family:'Unbounded',sans-serif;font-weight:900;font-size:66px;line-height:1.16;text-transform:uppercase}
+#caps span{display:inline-block;margin:0 22px;color:#fff;-webkit-text-stroke:3px #000;paint-order:stroke fill;text-shadow:0 8px 0 rgba(0,0,0,.85),0 0 40px rgba(0,0,0,.6)}
+#caps span.on{color:var(--y)}
+#badge{position:absolute;left:50%;top:60px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;font-weight:700;font-size:28px;letter-spacing:2px;padding:12px 26px;border-radius:40px;background:rgba(15,15,18,.7);border:1px solid rgba(255,255,255,.12);white-space:nowrap}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--tg);box-shadow:0 0 14px var(--tg)}
+.glowY{text-shadow:0 0 50px rgba(245,180,0,.7)}
+svg{overflow:visible}
+/* phone */
+#phone{width:600px;height:1220px;border-radius:84px;background:#0f0f11;padding:18px;box-shadow:0 0 0 4px #2b2b30,0 0 0 8px #111,0 60px 160px rgba(0,0,0,.85),0 0 140px rgba(42,171,238,.18)}
+#screen{width:564px;height:1184px;border-radius:66px;overflow:hidden;position:relative;background:#0b0b0d}
+#status{position:absolute;left:0;top:0;width:564px;height:50px;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:8px 44px 0;font-weight:700;font-size:22px;color:#fff}
+#notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:150px;height:40px;border-radius:24px;background:#000;z-index:21}
+/* telegram chat */
+#chat{position:absolute;inset:0;background:#0e1621;z-index:2}
+#chat .pat{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(#fff 1.5px,transparent 1.5px);background-size:28px 28px}
+#tgHead{position:absolute;left:0;top:50px;width:564px;height:86px;background:#17212b;display:flex;align-items:center;gap:16px;padding:0 20px;z-index:3}
+#tgHead img{width:58px;height:58px;border-radius:50%}
+.bubble{position:absolute;left:22px;width:420px;background:#182533;border-radius:22px 22px 22px 6px;padding:14px 18px;font-size:22px;line-height:1.35;z-index:3}
+.kb{position:absolute;left:22px;width:420px;height:58px;border-radius:14px;background:rgba(43,82,120,.7);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;z-index:3}
+#tgInput{position:absolute;left:0;bottom:0;width:564px;height:100px;background:#17212b;display:flex;align-items:center;gap:14px;padding:0 18px 18px;z-index:3}
+#openBtn{height:58px;padding:0 28px;border-radius:14px;background:var(--tg);display:flex;align-items:center;font-weight:700;font-size:24px}
+/* mini app */
+#app{position:absolute;inset:0;z-index:5;background:#0e0e12}
+#tmaBar{position:absolute;left:0;top:50px;width:564px;height:64px;background:#0e0e12;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:8;font-size:22px;border-bottom:1px solid rgba(255,255,255,.06)}
+.pg{position:absolute;left:0;top:114px;width:564px;height:1070px;overflow:hidden}
+.pg img.page{position:absolute;left:0;top:0;width:564px}
+.ahead{position:absolute;left:0;top:114px;width:564px;z-index:7}
+.anav{position:absolute;left:0;bottom:0;width:564px;z-index:7}
+.themeImg{position:absolute;left:0;top:114px;width:564px;z-index:9}
+#tap{position:absolute;width:90px;height:90px;border-radius:50%;border:4px solid rgba(255,255,255,.9);z-index:30;pointer-events:none}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs><radialGradient id="sg"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#E9FF7A"/><stop offset="1" stop-color="#F5B400"/></radialGradient>
+<symbol id="plane" viewBox="0 0 24 24"><path fill="#fff" d="M21.5 3.6 2.9 10.8c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.8l3.2-15.2c.3-1.3-.5-1.9-1.9-1.5zM8.6 13.5l10.6-6.7c.5-.3 1-.1.6.2l-9.1 8.2-.4 3.8z"/></symbol></defs></svg>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<div id="stage">
+
+<!-- A HOOK -->
+<div class="scene" id="sA">
+  <div class="abs big" id="h1" style="font-size:150px">Весь бот</div>
+  <div class="abs big" id="h2" style="font-size:96px">прямо в</div>
+  <div class="abs" id="h3" style="width:1080px;text-align:center">
+    <div style="margin:0 auto 26px;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#37BBFE,#007DBB);display:flex;align-items:center;justify-content:center;box-shadow:0 0 80px rgba(42,171,238,.6)"><svg width="70" height="70"><use href="#plane"/></svg></div>
+    <div class="big" style="font-size:100px;color:var(--tg);text-shadow:0 0 50px rgba(42,171,238,.6)">Telegram</div>
+  </div>
+</div>
+
+<!-- B PHONE (chat + mini app) -->
+<div class="scene" id="sB">
+  <div class="abs chip fill" id="secLbl" style="font-size:36px"></div>
+  <div class="abs" id="phone"><div id="screen">
+    <div id="status"><span>9:41</span><span style="letter-spacing:4px">▮▮▮ ◔</span></div><div id="notch"></div>
+    <div id="chat"><div class="pat"></div>
+      <div id="tgHead"><span style="font-size:34px;color:#6ab2f2">‹</span><img src="assets3/bot_avatar.jpg"><div><div style="font-weight:700;font-size:26px">DCA SOLANA TRADE | V3</div><div style="font-size:20px;color:#7d8b99">бот</div></div></div>
+      <div class="bubble" id="bub1" style="top:640px;left:auto;right:22px;width:auto;background:#2b5278;border-radius:22px 22px 6px 22px">/start</div>
+      <div class="bubble" id="bub2" style="top:730px"><b>DCA SOLANA TRADE V3</b><br>Торговля по DCA-ордерам на Solana. Откройте приложение, чтобы управлять ботом.</div>
+      <div class="kb" id="kb1" style="top:900px">Открыть приложение</div>
+      <div id="tgInput"><div id="openBtn">Открыть</div><div style="flex:1;height:58px;border-radius:30px;background:#242f3d;color:#6d7f8f;font-size:22px;display:flex;align-items:center;padding-left:22px">Сообщение</div></div>
+    </div>
+    <div id="app">
+      <div id="tmaBar"><span style="color:#6ab2f2">Закрыть</span><div style="text-align:center"><div style="font-weight:700;font-size:22px">DCA SOLANA TRADE | V3</div><div style="font-size:16px;color:#888">мини-приложение</div></div><span style="color:#6ab2f2;font-size:28px">⋯</span></div>
+      <div class="pg" id="pg_home"><img class="page" src="assets3/page_home.png"></div>
+      <div class="pg" id="pg_market"><img class="page" src="assets3/page_market.png"></div>
+      <div class="pg" id="pg_stats"><img class="page" src="assets3/page_stats.png"></div>
+      <div class="pg" id="pg_filters"><img class="page" src="assets3/page_filters.png"></div>
+      <div class="pg" id="pg_lab"><img class="page" src="assets3/page_lab.png"></div>
+      <div class="pg" id="pg_trading"><img class="page" src="assets3/page_trading.png"></div>
+      <div class="pg" id="pg_profile"><img class="page" src="assets3/page_profile.png"></div>
+      <img class="ahead" id="head_home" src="assets3/head_home.png"><img class="ahead" id="head_market" src="assets3/head_market.png"><img class="ahead" id="head_stats" src="assets3/head_stats.png"><img class="ahead" id="head_filters" src="assets3/head_filters.png"><img class="ahead" id="head_lab" src="assets3/head_lab.png"><img class="ahead" id="head_trading" src="assets3/head_trading.png"><img class="ahead" id="head_profile" src="assets3/head_profile.png">
+      <img class="anav" id="nav_home" src="assets3/nav_home.png"><img class="anav" id="nav_market" src="assets3/nav_market.png"><img class="anav" id="nav_stats" src="assets3/nav_stats.png"><img class="anav" id="nav_filters" src="assets3/nav_filters.png"><img class="anav" id="nav_trading" src="assets3/nav_trading.png"><img class="anav" id="nav_profile" src="assets3/nav_profile.png">
+      <img class="themeImg" id="th_Violet" src="assets3/theme_Violet.png"><img class="themeImg" id="th_Cyan" src="assets3/theme_Cyan.png"><img class="themeImg" id="th_Emerald" src="assets3/theme_Emerald.png"><img class="themeImg" id="th_Crimson" src="assets3/theme_Crimson.png"><img class="themeImg" id="th_Amber" src="assets3/theme_Amber.png">
+    </div>
+    <div id="tap"></div>
+  </div></div>
+  <div class="abs card" id="co_home_balance" style="width:860px"><img src="assets3/home_balance.png"></div>
+  <div class="abs card" id="co_home_tickers" style="width:900px"><img src="assets3/home_tickers.png"></div>
+  <div class="abs card" id="co_home_warn" style="width:900px;box-shadow:0 0 0 3px var(--r),0 0 80px rgba(255,59,92,.45)"><img src="assets3/home_warn.png"></div>
+  <div class="abs card" id="co_home_deposit" style="width:760px"><img src="assets3/home_deposit.png"></div>
+  <div class="abs card" id="co_market_buy" style="width:900px"><img src="assets3/market_buy.png"></div>
+  <div class="abs card" id="co_stats_result" style="width:860px"><img src="assets3/stats_result.png"></div>
+  <div class="abs card" id="co_stats_flow" style="width:860px"><img src="assets3/stats_flow.png"></div>
+  <div class="abs card" id="co_filters_market" style="width:720px"><img src="assets3/filters_market.png"></div>
+  <div class="abs card" id="co_filters_protect" style="width:880px"><img src="assets3/filters_protect.png"></div>
+  <div class="abs card" id="co_filters_black" style="width:820px"><img src="assets3/filters_black.png"></div>
+  <div class="abs card" id="co_trading_lock" style="width:900px"><img src="assets3/trading_lock.png"></div>
+  <div class="abs card" id="co_trading_exit" style="width:880px"><img src="assets3/trading_exit.png"></div>
+  <div class="abs card" id="co_trading_buy" style="width:760px"><img src="assets3/trading_buy.png"></div>
+  <div class="abs card" id="co_trading_jup" style="width:800px"><img src="assets3/trading_jup.png"></div>
+  <div class="abs card" id="co_profile_head" style="width:900px"><img src="assets3/profile_head.png"></div>
+  <div class="abs big" id="eight" style="font-size:300px;color:transparent;-webkit-text-stroke:6px #fff">8</div>
+</div>
+
+<!-- C FREE LIMITS -->
+<div class="scene" id="sC">
+  <div class="abs big" id="warnBig" style="font-size:170px;color:var(--r);text-shadow:0 0 60px rgba(255,59,92,.6)">Важно!</div>
+  <div class="abs card" id="fWarn" style="width:900px;box-shadow:0 0 0 3px var(--r),0 0 90px rgba(255,59,92,.5)"><img src="assets3/home_warn.png"></div>
+  <div class="abs card" id="fLock" style="width:900px;box-shadow:0 0 0 3px var(--r),0 0 90px rgba(255,59,92,.5)"><img src="assets3/trading_lock.png"></div>
+  <div class="abs chip" id="onlyMon" style="font-size:38px;border-color:#fff;color:#fff;display:flex;align-items:center;gap:16px">
+    <svg width="54" height="36" viewBox="0 0 24 16"><path d="M1 8s4-7 11-7 11 7 11 7-4 7-11 7S1 8 1 8z" fill="none" stroke="#fff" stroke-width="2"/><circle cx="12" cy="8" r="3.4" fill="#fff"/></svg>ТОЛЬКО НАБЛЮДЕНИЕ</div>
+  <div class="abs big" id="stamp" style="font-size:90px;color:var(--r);border:10px solid var(--r);padding:20px 34px;border-radius:20px;background:rgba(20,6,10,.85)">Бот не<br>торгует</div>
+  <div class="abs big glowY" id="proT" style="font-size:170px;color:var(--y)">PRO</div>
+  <div class="abs card" id="s1" style="width:300px"><img src="assets3/slot1.png"></div>
+  <div class="abs card" id="s2" style="width:300px"><img src="assets3/slot2.png"></div>
+  <div class="abs card" id="s3" style="width:300px"><img src="assets3/slot3.png"></div>
+  <div class="abs" id="from" style="text-align:center"><div class="big glowY" style="font-size:120px;color:var(--y)">от $300</div><div class="mono" style="font-size:40px;font-weight:700;margin-top:18px">ПОДПИСКА НА 12 МЕСЯЦЕВ</div></div>
+</div>
+
+<!-- D COMMISSION -->
+<div class="scene" id="sD">
+  <div class="abs mono" id="comHdr" style="font-size:38px;letter-spacing:8px;color:var(--y)">КОМИССИЯ С ПРИБЫЛИ</div>
+  <div class="abs big glowY" id="pct" style="font-size:330px;color:var(--y)">0%</div>
+  <div class="abs chip" id="cPlus" style="font-size:38px;border-color:var(--g);color:var(--g)">+ ТОЛЬКО С ПРИБЫЛЬНЫХ СДЕЛОК</div>
+  <div class="abs chip" id="cMinus" style="font-size:38px;border-color:#aaa;color:#ddd">УБЫТОЧНЫЕ — 0%</div>
+  <div class="abs card" id="comCard" style="width:900px"><img src="assets3/profile_sub.png"></div>
+</div>
+
+<!-- E CTA -->
+<div class="scene" id="sE">
+  <div class="abs" id="eAva" style="width:240px;height:240px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 6px var(--tg),0 0 90px rgba(42,171,238,.6)"><img src="assets3/bot_avatar.jpg" style="width:100%;height:100%"></div>
+  <div class="abs" id="eName" style="font-weight:700;font-size:84px;letter-spacing:-2px;white-space:nowrap">DCA SOLANA <span style="color:var(--y)">TRADE</span></div>
+  <div class="abs mono" id="eUrl" style="display:flex;align-items:center;gap:20px;font-size:46px;font-weight:700;padding:26px 44px;border-radius:60px;background:#0f1a24;border:3px solid var(--tg);white-space:nowrap;box-shadow:0 0 60px rgba(42,171,238,.4)"><svg width="46" height="46"><use href="#plane"/></svg><span id="eUrlT"></span></div>
+  <div class="abs big" id="eLink" style="font-size:80px">ссылка на бота<br><span style="color:var(--y)">в описании</span></div>
+  <svg class="abs" id="eArrow" width="120" height="140" viewBox="0 0 120 140"><path d="M60 0v110M15 70l45 50 45-50" stroke="#F5B400" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="abs" id="eWarn" style="width:900px;display:flex;gap:24px;align-items:center;padding:28px 34px;border-radius:24px;background:rgba(255,59,92,.08);border:2px solid rgba(255,59,92,.55)">
+    <svg width="70" height="70" viewBox="0 0 24 24" style="flex:none"><path d="M12 2 1 21h22L12 2z" fill="none" stroke="#FF3B5C" stroke-width="2" stroke-linejoin="round"/><path d="M12 9v5" stroke="#FF3B5C" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.3" fill="#FF3B5C"/></svg>
+    <div style="font-size:36px;line-height:1.3"><b>Крипта — это всегда риск.</b><br><span style="color:#bbb">Не финансовый совет · DYOR</span></div>
+  </div>
+</div>
+
+</div><!-- stage -->
+<div id="caps"></div>
+<div id="badge"><span class="dot"></span><span>DCA SOLANA TRADE · MINI APP</span></div>
+<canvas id="grain" width="640" height="1140"></canvas>
+<div id="vig"></div>
+<div id="flash"></div>
+<div id="prog"></div>
+
+<script src="words3.js"></script>
+<script>
+const W=1080,H=1920,DUR=80.3;
+const $=id=>document.getElementById(id);
+const C=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const P=(t,a,b)=>C((t-a)/(b-a));
+const L=(a,b,x)=>a+(b-a)*x;
+const E={o3:x=>1-Math.pow(1-x,3),o5:x=>1-Math.pow(1-x,5),expo:x=>x>=1?1:1-Math.pow(2,-10*x),
+ back:x=>{const c=1.9,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)},
+ io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,i3:x=>x*x*x,
+ el:x=>x===0?0:x===1?1:Math.pow(2,-10*x)*Math.sin((x*10-.75)*(2*Math.PI)/3)+1};
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function S(el,o){
+  if(typeof el==='string')el=$(el);
+  const x=o.x??540,y=o.y??960,s=o.s??1,r=o.r??0,rx=o.rx??0,ry=o.ry??0;
+  el.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) rotateX(${rx}deg) rotateY(${ry}deg) rotate(${r}deg) scale(${s})`;
+  const op=o.o??1;el.style.opacity=op;
+  el.style.filter=(o.b?`blur(${o.b}px)`:'')+(o.f||'');
+  if(el.dataset.d===undefined)el.dataset.d=el.style.display==='none'?'':el.style.display;
+  el.style.display=((o.o??1)<=0.001)?'none':el.dataset.d;
+}
+const scenes=[['sA',0,2.35],['sB',2.15,58.45],['sC',58.25,68.55],['sD',68.4,74.6],['sE',74.45,DUR+1]];
+const CUTS=[2.23,6.3,24.92,28.3,34.47,40.46,44.52,53.64,58.33,68.52,74.53];
+const IMPACTS=[[0.16,24],[1.42,26],[2.23,16],[6.3,16],[58.33,34],[63.07,28],[65.6,18],[71.61,26],[74.53,20]];
+const GLITCH=[2.2,58.3,63.07];
+const RED=[[58.25,64.0]];
+const isRed=t=>RED.some(([a,b])=>t>=a&&t<b);
+const isTg=t=>t<8.8||t>=74.4;
+
+// background
+const bg=$('bg').getContext('2d');
+const R=rng(7),parts=[...Array(70)].map(()=>({x:R()*W,y:R()*H,v:20+R()*60,s:1+R()*3,a:.15+R()*.5,ph:R()*6}));
+function drawBG(t){
+  bg.fillStyle='#08080a';bg.fillRect(0,0,W,H);
+  const accent=isRed(t)?[255,59,92]:isTg(t)?[42,171,238]:[245,180,0];
+  const orb=(x,y,r,c,a)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${c},${a})`);g.addColorStop(1,`rgba(${c},0)`);bg.fillStyle=g;bg.fillRect(x-r,y-r,2*r,2*r)};
+  orb(540+300*Math.sin(t*.4),500+200*Math.cos(t*.3),900,accent.join(','),.22);
+  orb(540-320*Math.cos(t*.35),1400+150*Math.sin(t*.5),850,'123,92,255',.22);
+  bg.save();bg.globalAlpha=.55;bg.strokeStyle=`rgba(${accent},.35)`;bg.lineWidth=2;
+  const hz=1180;
+  for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(540+i*18,hz);bg.lineTo(540+i*260,H+40);bg.stroke()}
+  const sp=(t*0.9)%1;
+  for(let k=0;k<14;k++){const z=(k+sp)/14;const y=hz+Math.pow(z,2.4)*(H-hz+60);bg.globalAlpha=.55*z;bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke()}
+  bg.restore();
+  const fade=bg.createLinearGradient(0,hz-40,0,hz+260);fade.addColorStop(0,'rgba(8,8,10,1)');fade.addColorStop(1,'rgba(8,8,10,0)');bg.fillStyle=fade;bg.fillRect(0,hz-40,W,300);
+  for(const p of parts){const y=((p.y-t*p.v)%H+H)%H;bg.fillStyle=`rgba(${accent.map(c=>Math.min(255,c+60))},${p.a*(.6+.4*Math.sin(t*2+p.ph))})`;bg.fillRect(p.x+Math.sin(t+p.ph)*20,y,p.s,p.s)}
+}
+const gr=$('grain').getContext('2d'),gimgs=[];
+for(let k=0;k<4;k++){const r=rng(100+k),d=gr.createImageData(640,1140);for(let i=0;i<d.data.length;i+=4){const v=r()*255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}gimgs.push(d)}
+
+// captions
+const WORDS=window.WORDS;const groups=[];{let g=[];WORDS.forEach((w)=>{g.push(w);const long=g.map(x=>x.w).join(' ').length;if(/[.!?,:;]/.test(w.p)||g.length>=3||long>14){groups.push(g);g=[]}});if(g.length)groups.push(g)}
+groups.forEach((g,i)=>{g.start=g[0].s;g.end=i<groups.length-1?Math.min(groups[i+1][0].s,g[g.length-1].e+0.6):g[g.length-1].e+1.2});
+const capsEl=$('caps');let lastG=null;
+function drawCaps(t){
+  if(t<2.2||t>=74.45){capsEl.style.opacity=0;return}
+  const g=groups.find(g=>t>=g.start&&t<g.end);
+  if(!g){capsEl.style.opacity=0;return}
+  if(g!==lastG){capsEl.innerHTML=g.map(w=>`<span>${w.w}</span>`).join('');lastG=g}
+  capsEl.style.opacity=1;
+  const k=E.back(P(t,g.start,g.start+.22));
+  capsEl.style.transform=`translateY(${(1-k)*40}px) scale(${L(.75,1,k)})`;
+  [...capsEl.children].forEach((sp,i)=>{const w=g[i];const on=t>=w.s-0.03;const act=on&&(i===g.length-1||t<g[i+1].s);
+    sp.className=act?'on':'';const kk=E.back(P(t,w.s-.03,w.s+.15));sp.style.transform=`scale(${act?L(1,1.1,kk):1})`;sp.style.opacity=on?1:.55});
+}
+
+function sA(t){
+  const pop=(id,t0,from,y)=>{const k=E.expo(P(t,t0,t0+.3));S(id,{y,s:L(from,1,k),o:P(t,t0,t0+.08),b:(1-k)*14})};
+  const ex=P(t,2.0,2.3);
+  pop('h1',0.16,3,740);pop('h2',0.94,2.2,900);
+  const k3=E.el(P(t,1.4,2.1));S('h3',{y:1130,s:k3*(1+ex*.6),o:P(t,1.4,1.45)*(1-ex)});
+  $('sA').style.opacity=1-ex;
+}
+// tabs & pages
+const TABS=[['home',8.86,24.92,0,1700],['market',24.92,28.3,0,300],['stats',28.3,34.47,0,1500],['filters',34.47,40.46,0,600],['lab',40.46,44.52,0,2600],['trading',44.52,53.64,0,1500],['profile',53.64,58.45,0,250]];
+const NAVX={home:58,market:146,stats:236,filters:326,trading:412,profile:500};
+const LABELS={home:'ГЛАВНАЯ',market:'РЫНОК',stats:'СТАТИСТИКА',filters:'ФИЛЬТРЫ',lab:'ЛАБОРАТОРИЯ',trading:'ТОРГОВЛЯ',profile:'ПРОФИЛЬ'};
+const CO=[['co_home_balance',9.6,12.1],['co_home_tickers',12.25,14.1],['co_home_warn',14.2,20.0],['co_home_deposit',20.1,24.75],['co_market_buy',25.6,28.15],['co_stats_result',29.2,31.75],['co_stats_flow',31.8,34.3],['co_filters_market',35.1,38.1],['co_filters_protect',38.2,39.45],['co_filters_black',39.5,40.4],['co_trading_lock',46.0,47.6],['co_trading_exit',47.7,49.8],['co_trading_buy',49.82,51.85],['co_trading_jup',51.9,53.5],['co_profile_head',54.39,56.4]];
+const SC=564/1080;
+const THEMES=['Violet','Cyan','Emerald','Crimson','Amber'];
+function sB(t){
+  const kin=E.o5(P(t,2.23,2.9)),kout=E.i3(P(t,58.15,58.45));
+  let act=0;for(const [,a,b] of CO){act=Math.max(act,Math.min(E.o3(P(t,a,a+.3)),1-E.o3(P(t,b-.25,b))))}
+  const big=t<8.8?1:0; // phone bigger during chat intro
+  S('phone',{y:L(1800,860,kin)-kout*1300-act*170,s:L(.7,1,kin)*(1-act*.24),rx:L(30,0,kin),ry:Math.sin(t*.8)*4,f:` brightness(${1-act*.35})`,b:act});
+  // chat
+  S('bub1',{y:0,x:0,o:P(t,2.9,3.1)});$('bub1').style.transform=`translateY(${(1-E.back(P(t,2.9,3.2)))*40}px)`;
+  $('bub2').style.opacity=P(t,3.3,3.5);$('bub2').style.transform=`translateY(${(1-E.back(P(t,3.3,3.7)))*40}px)`;
+  $('kb1').style.opacity=P(t,3.7,3.9);
+  $('openBtn').style.boxShadow=`0 0 ${20+20*Math.sin(t*8)}px rgba(42,171,238,${t>4.5&&t<5.6?.9:.2})`;
+  // app sheet
+  const ka=E.o5(P(t,5.6,6.4));
+  $('app').style.transform=`translateY(${(1-ka)*1184}px)`;$('app').style.display=t<5.6?'none':'';
+  $('chat').style.display=ka>=1?'none':'';
+  // pages
+  let cur=0;TABS.forEach(([n,a],i)=>{if(t>=a)cur=i});
+  TABS.forEach(([n,a,b,y0,y1],i)=>{
+    const el=$('pg_'+n);const nxt=TABS[i+1];
+    const kIn=i?E.o5(P(t,a,a+.4)):1;const kOut=nxt?E.o5(P(t,nxt[1],nxt[1]+.4)):0;
+    const vis=(i===0?t>=5.6:t>=a)&&kOut<1;
+    el.style.display=vis?'':'none';if(!vis)return;
+    el.style.opacity=kIn;el.style.transform=`translateX(${(1-kIn)*80}px)`;el.style.zIndex=i;
+    const sc=E.io(P(t,a+.8,b-.3));el.querySelector('img').style.transform=`translateY(${-L(y0,y1,sc)*SC}px)`;
+  });
+  const curN=TABS[cur][0];
+  ['home','market','stats','filters','lab','trading','profile'].forEach(n=>{$('head_'+n).style.display=n===curN?'':'none'});
+  const navN=curN==='lab'?'filters':curN;
+  ['home','market','stats','filters','trading','profile'].forEach(n=>{$('nav_'+n).style.display=(n===navN&&curN!=='lab')?'':'none'});
+  // theme switching at end of profile
+  const tt=t-56.5;
+  const ti=(tt>=0&&t<58.45)?Math.min(4,Math.floor(tt/.38)):-1;THEMES.forEach((th,i)=>{$('th_'+th).style.display=i===ti?'':'none'});
+  S('eight',{x:880,y:520,s:E.el(P(t,57.04,57.6)),r:-8,o:P(t,57.04,57.1)*(1-P(t,58.1,58.4))});
+  // taps
+  const taps=[[5.42,85,1134],[24.75,NAVX.market,1140],[28.15,NAVX.stats,1140],[34.3,NAVX.filters,1140],[40.3,282,420],[44.35,NAVX.trading,1140],[53.45,NAVX.profile,1140],[56.4,200,800]];
+  let tp=null;for(const [tq,x,y] of taps){if(t>=tq&&t<tq+.45)tp=[t-tq,x,y]}
+  const tap=$('tap');if(tp){const k=tp[0]/.45;tap.style.display='';tap.style.left=(tp[1]-45)+'px';tap.style.top=(tp[2]-45)+'px';tap.style.transform=`scale(${L(.4,1.4,E.o3(k))})`;tap.style.opacity=1-k}else tap.style.display='none';
+  // label
+  const lbl=t<5.6?'TELEGRAM-БОТ':t<8.86?'МИНИ-ПРИЛОЖЕНИЕ':LABELS[curN];
+  const la=t<5.6?2.23:t<8.86?6.3:TABS[cur][1];
+  $('secLbl').textContent=lbl;$('secLbl').className='abs chip '+(t<8.86?'tg':'fill');
+  S('secLbl',{y:190,s:E.back(P(t,la,la+.35)),r:-2,o:(1-kout)*P(t,2.3,2.4)});
+  // callouts
+  CO.forEach(([id,a,b])=>{
+    if(!(t>=a&&t<b)){$(id).style.display='none';return}
+    const ki=E.back(P(t,a,a+.45)),ko=E.i3(P(t,b-.25,b));
+    S(id,{y:L(1400,1030,ki)-ko*120,s:L(.5,.9,ki)*(1-ko*.2),rx:L(-25,0,ki)+Math.sin(t*1.4)*2,ry:Math.sin(t*.9)*3,o:P(t,a,a+.08)*(1-ko),f:id==='co_home_warn'?'':' drop-shadow(0 0 40px rgba(245,180,0,.35))'});
+  });
+}
+function sC(t){
+  const kw=E.expo(P(t,58.33,58.65)),wUp=E.io(P(t,58.9,59.4));
+  S('warnBig',{y:L(860,215,wUp),s:L(3,1,kw)*L(1,.55,wUp),o:P(t,58.33,58.37)*(1-P(t,63.8,64.0))});
+  const kf=E.o5(P(t,59.1,59.7)),fA=E.io(P(t,61.0,61.4));
+  S('fWarn',{y:L(1700,760,kf)-fA*260,s:L(1,.8,fA),o:P(t,59.1,59.2)*(1-P(t,63.8,64.0))});
+  const kl=E.o5(P(t,61.25,61.8));
+  S('fLock',{y:L(1800,1110,kl),s:.9,o:P(t,61.25,61.35)*(1-P(t,63.8,64.0))});
+  S('onlyMon',{y:340,s:E.back(P(t,62.33,62.7)),o:P(t,62.33,62.4)*(1-P(t,63.8,64.0))});
+  const ks=E.expo(P(t,63.07,63.35));const jit=(t>63.07&&t<63.4)?Math.sin(t*200)*10:0;
+  S('stamp',{x:540+jit,y:1250,s:L(3,1,ks),r:-8,o:P(t,63.07,63.12)*(1-P(t,63.8,64.0))});
+  // PRO + slots
+  S('proT',{y:330,s:E.el(P(t,65.6,66.3)),o:P(t,65.6,65.65)});
+  [['s1',66.08,220],['s2',66.3,540],['s3',66.52,860]].forEach(([id,a,x],i)=>{const k=E.back(P(t,a,a+.45));S(id,{x,y:L(1500,800,k),s:1.0,r:(i-1)*4*(1-k),o:P(t,a,a+.06),f:' drop-shadow(0 0 30px rgba(245,180,0,.4))'})});
+  S('from',{y:1250,s:E.back(P(t,66.92,67.3)),o:P(t,66.92,66.98)});
+  const e=P(t,68.3,68.55);$('sC').style.opacity=1-e;
+}
+function sD(t){
+  S('comHdr',{y:300,o:E.o3(P(t,68.55,68.9))});
+  const v=Math.round(20*E.o3(P(t,71.6,72.2)));$('pct').textContent=v+'%';
+  S('pct',{y:620,s:E.back(P(t,68.55,69.0))*(t>71.6&&t<72.3?1+.08*Math.sin((t-71.6)*20)*(1-P(t,71.6,72.3)):1),o:P(t,68.55,68.6)});
+  S('cPlus',{y:870,s:E.back(P(t,69.28,69.6)),o:P(t,69.28,69.33)});
+  S('cMinus',{y:980,s:E.back(P(t,72.78,73.1)),o:P(t,72.78,72.83)});
+  S('comCard',{y:L(1800,1270,E.o5(P(t,69.8,70.4))),o:P(t,69.8,69.9)});
+  const e=P(t,74.3,74.55);$('sD').style.opacity=1-e;
+}
+function sE(t){
+  const k=E.back(P(t,74.53,75.0));
+  S('eAva',{y:420,s:k,o:P(t,74.53,74.6)});
+  S('eName',{y:640,s:L(.7,.95,E.expo(P(t,74.7,75.1))),o:P(t,74.7,74.8)});
+  const url='@dca_solana_trade_bot';const n=Math.floor(E.o3(P(t,74.9,75.8))*url.length);
+  $('eUrlT').textContent=url.slice(0,n)+(t<76.2&&(Math.floor(t*3)%2===0||n<url.length)?'▌':'');
+  S('eUrl',{y:820,s:E.back(P(t,74.85,75.2))*(1+.025*Math.sin(t*5)),o:P(t,74.85,74.9)});
+  S('eLink',{y:1060,s:E.el(P(t,75.1,75.8)),o:P(t,75.1,75.15)});
+  S('eArrow',{y:1260+Math.abs(Math.sin(t*5))*30,o:P(t,75.6,75.8)});
+  S('eWarn',{y:L(1800,1480,E.o5(P(t,76.4,76.9))),o:P(t,76.4,76.5)});
+}
+const RF={sA,sB,sC,sD,sE};
+function renderAt(t){
+  drawBG(t);
+  for(const [id,a,b] of scenes){const el=$(id);if(t>=a&&t<b){el.style.display='block';RF[id](t)}else el.style.display='none'}
+  let sx=0,sy=0,sc=1;
+  for(const [ti,amp] of IMPACTS){const d=t-ti;if(d>=0&&d<.6){const e=Math.exp(-d*9);sx+=amp*e*Math.sin(d*90);sy+=amp*e*Math.cos(d*77);sc+=.05*e}}
+  for(const c of CUTS){const d=t-c;if(d>=0&&d<.4)sc+=.05*Math.exp(-d*12)}
+  const rot=Math.sin(t*.7)*.4;sc+=0.012*Math.sin(t*.9);
+  let glitch='';for(const g of GLITCH){const d=t-g;if(d>=0&&d<.18){const a=14*(1-d/.18);glitch=`drop-shadow(${a}px 0 0 rgba(255,0,70,.75)) drop-shadow(${-a}px 0 0 rgba(0,230,255,.75))`;sx+=Math.sin(t*300)*a}}
+  const st=$('stage');st.style.transform=`translate(${sx}px,${sy}px) rotate(${rot}deg) scale(${sc})`;st.style.filter=glitch;
+  let fl=0;for(const c of CUTS){const d=t-c;if(d>=-.03&&d<.3)fl=Math.max(fl,.4*Math.exp(-Math.max(0,d)*14))}
+  $('flash').style.opacity=fl;$('flash').style.background=isRed(t)?'#ff2a4a':isTg(t)?'#9fdcff':'#fff';
+  drawCaps(t);
+  $('badge').style.opacity=C(P(t,2.4,2.8)-P(t,74.2,74.5));
+  $('prog').style.width=(t/DUR*100)+'%';
+  gr.putImageData(gimgs[Math.floor(t*30)%4],0,0);
+  $('grain').style.transform=`translate(${(Math.floor(t*30)*37)%100}px,${(Math.floor(t*30)*53)%100}px) scale(2)`;
+  document.body.style.opacity=1-P(t,DUR-0.5,DUR);
+}
+window.renderAt=renderAt;window.DUR=DUR;
+Promise.all([document.fonts.ready,...[...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r}))]).then(()=>{
+  // preload theme images
+  return Promise.all(THEMES.map(th=>new Promise(r=>{const im=new Image();im.onload=im.onerror=r;im.src='assets3/theme_'+th+'.png'})));
+}).then(()=>{window.READY=true});
+</script>
+</body></html>
