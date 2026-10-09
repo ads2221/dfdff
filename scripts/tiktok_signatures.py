@@ -6,7 +6,13 @@
 Пример:
     git clone https://github.com/n1tr00-10/tiktok-signature ~/tiktok-signature
     export TIKTOK_SIGNATURE_PATH=~/tiktok-signature
-    python3 scripts/tiktok_signatures.py "https://www.tiktok.com/api/v1/feed?aid=1988&app_name=tiktok_web"
+    python3 scripts/tiktok_signatures.py "https://www.tiktok.com/api/v1/feed?aid=1988&app_name=tiktok_web" \
+        --cookies ~/secrets/tiktok_cookies.json
+
+Куки можно передать файлом (--cookies, JSON-массив из расширения браузера
+или строка вида "name=value; name2=value2") либо переменной окружения TIKTOK_COOKIES.
+Из них используется только msToken — он передаётся в X-Bogus.
+Файлы с куками не храните в репозитории.
 
 Вывод — JSON с подписями. В библиотеке x_bogus.py сейчас заглушка, которая
 возвращает "1", поэтому X-Bogus будет невалидным (скрипт выведет предупреждение).
@@ -17,6 +23,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Dict, Optional
 from urllib.parse import urlsplit
 
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -37,13 +44,35 @@ def load_library(lib_path: Path):
     return get_X_Gnarly, get_X_Bogus, get_X_Dynosaur
 
 
-def build_signatures(url: str, body: str, user_agent: str, lib_path: Path) -> dict:
+def parse_cookies(raw: str) -> Dict[str, str]:
+    raw = raw.strip()
+    if raw.startswith("["):
+        # JSON-экспорт кук из расширения браузера: список объектов с name и value
+        return {cookie["name"]: cookie["value"] for cookie in json.loads(raw)}
+    cookies = {}
+    for part in raw.split(";"):
+        name, sep, value = part.strip().partition("=")
+        if sep:
+            cookies[name] = value
+    return cookies
+
+
+def read_cookies(cookies_file: Optional[str]) -> Dict[str, str]:
+    if cookies_file:
+        return parse_cookies(Path(cookies_file).expanduser().read_text(encoding="utf-8"))
+    env_value = os.environ.get("TIKTOK_COOKIES")
+    return parse_cookies(env_value) if env_value else {}
+
+
+def build_signatures(
+    url: str, body: str, user_agent: str, ms_token: str, lib_path: Path
+) -> dict:
     get_X_Gnarly, get_X_Bogus, get_X_Dynosaur = load_library(lib_path)
     # X-Gnarly и X-Dynosaur принимают только query-строку без "?", X-Bogus — полный URL
     query = urlsplit(url).query
     return {
         "X-Gnarly": get_X_Gnarly(query, body, user_agent, version="5.1.2"),
-        "X-Bogus": get_X_Bogus(url, body, ""),
+        "X-Bogus": get_X_Bogus(url, body, ms_token),
         "X-Dynosaur": get_X_Dynosaur(query, user_agent, body),
     }
 
@@ -58,13 +87,23 @@ def main() -> None:
         default=os.environ.get("TIKTOK_SIGNATURE_PATH"),
         help="путь к клону библиотеки tiktok-signature (по умолчанию $TIKTOK_SIGNATURE_PATH)",
     )
+    parser.add_argument(
+        "--cookies",
+        help="файл с куками (JSON или строка name=value; ...), по умолчанию $TIKTOK_COOKIES",
+    )
     args = parser.parse_args()
 
     if not args.lib_path:
         parser.error("укажите --lib-path или переменную окружения TIKTOK_SIGNATURE_PATH")
 
+    cookies = read_cookies(args.cookies)
+
     signatures = build_signatures(
-        args.url, args.body, args.user_agent, Path(args.lib_path).expanduser().resolve()
+        args.url,
+        args.body,
+        args.user_agent,
+        cookies.get("msToken", ""),
+        Path(args.lib_path).expanduser().resolve(),
     )
 
     if signatures["X-Bogus"] == X_BOGUS_STUB_VALUE:

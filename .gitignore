@@ -1,0 +1,6 @@
+# Файлы с куками и сессиями не коммитим
+cookies*.json
+*cookies*.txt
+*.cookies
+tiktok_cookies*
+__pycache__/
