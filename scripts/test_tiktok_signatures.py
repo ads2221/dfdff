@@ -27,6 +27,21 @@ class ParseCookiesTest(unittest.TestCase):
         self.assertEqual(ts.parse_cookies(" ; novalue ; a=1 ;"), {"a": "1"})
 
 
+class AddSignaturesToUrlTest(unittest.TestCase):
+    def test_appends_signatures_to_existing_query(self):
+        url = "https://www.tiktok.com/api/v1/feed?aid=1988&app_name=tiktok_web"
+        result = ts.add_signatures_to_url(url, {"X-Bogus": "b/+=", "X-Gnarly": "g"})
+        self.assertEqual(
+            result,
+            "https://www.tiktok.com/api/v1/feed?aid=1988&app_name=tiktok_web"
+            "&X-Bogus=b%2F%2B%3D&X-Gnarly=g",
+        )
+
+    def test_url_without_query(self):
+        result = ts.add_signatures_to_url("https://www.tiktok.com/api", {"X-Gnarly": "g"})
+        self.assertEqual(result, "https://www.tiktok.com/api?X-Gnarly=g")
+
+
 class ReadCookiesTest(unittest.TestCase):
     def test_reads_file(self):
         with tempfile.TemporaryDirectory() as tmp:

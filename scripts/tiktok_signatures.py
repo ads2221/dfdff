@@ -22,9 +22,11 @@ import argparse
 import json
 import os
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Dict, Optional
-from urllib.parse import urlsplit
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 X_BOGUS_STUB_VALUE = "1"
@@ -64,6 +66,29 @@ def read_cookies(cookies_file: Optional[str]) -> Dict[str, str]:
     return parse_cookies(env_value) if env_value else {}
 
 
+def add_signatures_to_url(url: str, signatures: dict) -> str:
+    # Предположение: подписи передаются query-параметрами с теми же именами.
+    # Библиотека этого не описывает, поэтому проверяется режимом --check.
+    parts = urlsplit(url)
+    params = parse_qsl(parts.query, keep_blank_values=True)
+    params += list(signatures.items())
+    return urlunsplit(parts._replace(query=urlencode(params)))
+
+
+def send_check_request(url: str, user_agent: str, cookies: Dict[str, str]) -> None:
+    headers = {"User-Agent": user_agent, "Referer": "https://www.tiktok.com/"}
+    if cookies:
+        headers["Cookie"] = "; ".join(f"{name}={value}" for name, value in cookies.items())
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            status, body = response.status, response.read(300)
+    except urllib.error.HTTPError as error:
+        status, body = error.code, error.read(300)
+    print(f"HTTP {status}")
+    print(body.decode("utf-8", errors="replace"))
+
+
 def build_signatures(
     url: str, body: str, user_agent: str, ms_token: str, lib_path: Path
 ) -> dict:
@@ -91,6 +116,11 @@ def main() -> None:
         "--cookies",
         help="файл с куками (JSON или строка name=value; ...), по умолчанию $TIKTOK_COOKIES",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="отправить GET-запрос с подписями в query и куками, вывести HTTP-статус и начало ответа",
+    )
     args = parser.parse_args()
 
     if not args.lib_path:
@@ -114,6 +144,11 @@ def main() -> None:
         )
 
     print(json.dumps(signatures, ensure_ascii=False, indent=2))
+
+    if args.check:
+        send_check_request(
+            add_signatures_to_url(args.url, signatures), args.user_agent, cookies
+        )
 
 
 if __name__ == "__main__":
