@@ -9,10 +9,10 @@ const E = { o3: x => 1 - Math.pow(1 - x, 3), o5: x => 1 - Math.pow(1 - x, 5), io
 function rng(s) { return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const ERR = []; window.ERR = ERR;
 const TL = window.TL, CH = TL.chapters, DUR = TL.DUR, META = window.META, TG = window.TARGETS, WORDS = window.WORDS;
-const PANEL = ['dashboard','wallet','orders-v3','dca-stats','archive','dca-lab','trading','portfolio','tpsl','user-stats','alerts','filters','blacklist','plans','docs','profile'];
+const PANEL = ['dashboard','wallet','orders-v3','dca-stats','dca-lab','trading','portfolio','tpsl','user-stats','alerts','filters','blacklist','plans','docs','profile'];
 const URLS = { landing: 'jupiter-dca-bot.online', auth: 'jupiter-dca-bot.online/panel/auth' };
 PANEL.forEach(p => URLS[p] = 'jupiter-dca-bot.online/panel/' + p);
-const KSCR = 0.98, WX = 176, WY = 70; // content -> screen
+const KSCR = 0.9, WX = 240, WY = 54; // content -> screen
 const MX = 236; // main left offset in content
 const HEADH = 69;
 
@@ -113,7 +113,7 @@ for (const o of order) {
     const page = pageAt(t + .01).page; const r = clickRect(page, a2); ensureVisible(page, r, t);
     KF.push({ t, page, x: r.x + r.w / 2, y: r.y + r.h / 2, click: true, fixed: !!r.fixed || page === 'auth' });
   }
-  else if (kind === 'ov') OVS.push({ name: a2, t0: t, t1: endAnchor(ci, a3) });
+  else if (kind === 'ov') OVS.push({ name: a2, t0: t, t1: a3 === 999 ? DUR : Math.min(endAnchor(ci, a3), CH[ci].end + .2) });
   else if (kind === 'scene') SCENES.push({ t, s: a2 });
   else MINI.push({ kind, t, a: a2, b: a3, c: a4 });
 }
@@ -141,7 +141,7 @@ for (const m of MINI) {
   if (m.kind === 'mscroll') KF.push({ t: m.t - .15, x: MLEFT + 250, y: 500, wheel: true, fixed: true, mini: true });
   if (m.kind === 'mco') { const el = document.createElement('div'); el.className = 'mco'; el.innerHTML = `<img src="a3/${m.a}.png">`; $('tg').appendChild(el); MCOS.push({ ...m, el, label: m.b, color: (m.c || {}).color }); }
 }
-MCOS.forEach((m, i) => { const nx = MCOS[i + 1]; m.t1 = nx ? Math.min(nx.t - .05, m.t + 4.2) : m.t + 4.2; });
+MCOS.forEach((m, i) => { const nx = MCOS[i + 1]; m.t1 = nx ? Math.min(nx.t - .35, m.t + 4.2) : m.t + 4.2; });
 const mEv = k => MINI.filter(m => m.kind === k);
 function miniTab(t) { let tab = 'home', t0 = -1; for (const m of MINI) { if (m.t > t) break; if (m.kind === 'mtab') { tab = m.a; t0 = m.t; } if (m.kind === 'mlab') { tab = 'lab'; t0 = m.t; } } return { tab, t0 }; }
 function miniScroll(t, t0) { let v = 0, from = 0, to = 0, s0 = -1; for (const m of mEv('mscroll')) { if (m.t < t0 || m.t > t) continue; from = s0 < 0 ? 0 : L(from, to, E.io(P(m.t, s0, s0 + 1.3))); to = m.a; s0 = m.t; } return s0 < 0 ? 0 : L(from, to, E.io(P(t, s0, s0 + 1.3))); }
@@ -206,7 +206,8 @@ const OV = {
 // replace emoji globe with svg
 OV.cta.innerHTML = OV.cta.innerHTML.replace('🌐&nbsp;', '<svg width="26" height="26" viewBox="0 0 24 24" style="vertical-align:-5px;margin-right:10px"><circle cx="12" cy="12" r="10" fill="none" stroke="#1FD18B" stroke-width="2"/><path d="M2 12h20M12 2c3 3 4 6.5 4 10s-1 7-4 10c-3-3-4-6.5-4-10s1-7 4-10z" fill="none" stroke="#1FD18B" stroke-width="2"/></svg>');
 $('dcaBars').innerHTML = [...Array(20)].map((_, i) => `<div class="db" style="flex:1;border-radius:4px 4px 0 0;background:linear-gradient(#9BF7CF,#1FD18B);height:0"></div>`).join('');
-const OVPOS = { intro: [80, 790], tgteaser: [1450, 40], dca: [1220, 150], delay: [700, 40], fee: [1260, 110], slots: [1300, 150], chain: [1440, 90], exits: [1440, 150], cta: [470, 250], disc: [300, 860] };
+const OVPOS = { intro: [80, 790], tgteaser: [1500, 60], dca: [1220, 150], delay: [700, 60], fee: [660, 150], slots: [1300, 150], chain: [262, 100], exits: [262, 150], cta: [470, 230], disc: [300, 870] };
+const FOCUS = { fee: .6, cta: .6 };
 function place(el, x, y, s, o) { el.style.transform = `translate(${x}px,${y}px) scale(${s})`; el.style.opacity = o; el.style.display = o <= .001 ? 'none' : ''; }
 
 const OPEN = mk(`<div style="width:1920px;text-align:center"><svg width="170" height="170" viewBox="-110 -110 220 220"><path d="M0-105 C8-20 20-8 105 0 C20 8 8 20 0 105 C-8 20 -20 8 -105 0 C-20 -8 -8 -20 0 -105Z" fill="#1FD18B"/><circle r="12" fill="#EAFFF5"/></svg>
@@ -329,7 +330,7 @@ function renderAt(t) {
   $('chapRail').style.opacity = winIn;
   // chapter card
   if (cardCh && cardK > 0.001) { cc.style.display = 'block'; const n = CH.indexOf(cardCh);
-    $('ccNum').textContent = String(n + 1).padStart(2, '0'); $('ccTitle').textContent = cardCh.title; $('ccSub').textContent = `ГЛАВА ${n + 1} / ${CH.length}`;
+    $('ccNum').textContent = String(n + 1).padStart(2, '0'); if ($('ccTitle').textContent !== cardCh.title) { const el = $('ccTitle'); el.textContent = cardCh.title; el.style.fontSize = '86px'; const w = el.scrollWidth; if (w > 1060) el.style.fontSize = (86 * 1060 / w) + 'px'; } $('ccSub').textContent = `ГЛАВА ${n + 1} / ${CH.length}`;
     const a = cardCh.card; const kN = E.o5(P(t, a - .2, a + .6)), kT = E.o5(P(t, a, a + .7)), kL = E.io(P(t, a + .1, a + 1.0));
     $('ccNum').style.transform = `translate(${L(260, 200, kN)}px,300px)`; $('ccNum').style.opacity = kN * cardK;
     $('ccSub').style.transform = `translate(${L(820, 780, kT)}px,420px)`; $('ccSub').style.opacity = kT * cardK;
@@ -337,16 +338,19 @@ function renderAt(t) {
     $('ccLine').style.transform = `translate(780px,600px)`; $('ccLine').style.width = (kL * 760) + 'px'; $('ccLine').style.opacity = cardK;
   } else cc.style.display = 'none';
   // overlays
+  let focusDim = 0;
   for (const [name, el] of Object.entries(OV)) {
     const o = OVS.filter(v => v.name === name && t >= v.t0 - .05 && t < v.t1 + .4).pop();
     if (!o) { el.style.display = 'none'; continue; }
     const k = Math.min(E.back(P(t, o.t0, o.t0 + .5)), 1); const out = P(t, o.t1, o.t1 + .4);
-    const [x, y] = OVPOS[name]; place(el, x, y + (1 - k) * 30 + out * 20, L(.9, 1, k), C(P(t, o.t0, o.t0 + .25) * (1 - out)));
+    const [x, y] = OVPOS[name]; const op = C(P(t, o.t0, o.t0 + .25) * (1 - out)) * (1 - cardK); place(el, x, y + (1 - k) * 30 + out * 20, L(.9, 1, k), op);
+    if (FOCUS[name]) focusDim = Math.max(focusDim, FOCUS[name] * op);
     if (name === 'dca') { [...el.querySelectorAll('.db')].forEach((b, i) => { const kk = E.o3(P(t, o.t0 + .6 + i * .18, o.t0 + .9 + i * .18)); b.style.height = (kk * (40 + (i % 5) * 12 + i * 2.5)) + 'px'; b.style.opacity = .4 + .6 * kk; }); }
     if (name === 'chain' || name === 'exits') [...el.querySelectorAll('.ck')].forEach((c, i) => { const kk = E.o3(P(t, o.t0 + .3 + i * (name === 'chain' ? .55 : .9), o.t0 + .6 + i * (name === 'chain' ? .55 : .9))); c.style.opacity = .15 + .85 * kk; c.style.transform = `translateX(${(1 - kk) * 24}px)`; });
     if (name === 'slots') [...el.querySelectorAll('.sl')].forEach((c, i) => { const kk = E.back(P(t, o.t0 + .3 + i * .35, o.t0 + .8 + i * .35)); c.style.opacity = C(kk); c.style.transform = `translateY(${(1 - C(kk)) * 20}px)`; });
     if (name === 'delay') el.querySelector('#dlh').setAttribute('transform', `rotate(${t * 240})`);
   }
+  if (focusDim > 0) { $('cam').style.opacity = winIn * (1 - cardK * .85) * (1 - focusDim); }
   // opening title (before window)
   { const k = E.o5(P(t, .2, 1.2)), out = E.io(P(t, 2.8, 3.6)); place(OPEN, 0, 300 - out * 120, L(.9, 1, k) * L(1, .8, out), C(P(t, .1, .6) * (1 - out)));
     const sv = OPEN.querySelector('svg'); sv.style.transform = `rotate(${t * 40}deg) scale(${E.back(P(t, .1, .9))})`; }
@@ -360,7 +364,7 @@ function renderAt(t) {
 function renderMini(t) {
   $('spot').style.display = 'none'; $('spotLbl').style.display = 'none';
   const open = mEv('mopen')[0]; const mini = $('mini');
-  $('b1').style.opacity = P(t, CH[12].start + .6, CH[12].start + .9); $('b2').style.opacity = P(t, CH[12].start + 1.1, CH[12].start + 1.4);
+  const MC = CH.find(c => c.id === 'c12'); $('b1').style.opacity = P(t, MC.start + .6, MC.start + .9); $('b2').style.opacity = P(t, MC.start + 1.1, MC.start + 1.4);
   $('openBtn').style.boxShadow = open && t > open.t - 1.2 && t < open.t + .3 ? `0 0 ${18 + 14 * Math.sin(t * 10)}px rgba(42,171,238,.9)` : 'none';
   if (!open || t < open.t + .15) { mini.style.display = 'none'; MCOS.forEach(m => m.el.style.display = 'none'); return; }
   const k = E.back(P(t, open.t + .15, open.t + .65));

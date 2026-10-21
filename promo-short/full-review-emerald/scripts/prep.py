@@ -1,12 +1,12 @@
 from PIL import Image
 import json, re, unicodedata, subprocess, os
 Image.MAX_IMAGE_PIXELS = None
-D = '../v2/desk'; os.makedirs('a', exist_ok=True); os.makedirs('a3', exist_ok=True)
-pages = ['dashboard','wallet','orders-v3','dca-stats','archive','dca-lab','trading','portfolio','tpsl','user-stats','alerts','filters','blacklist','plans','docs','profile']
-VIEW = {'dashboard': 'dashboard_view2', 'filters': 'filters_view2', 'docs': 'docs_pview'}
-meta = {}; tg = json.load(open(f'{D}/targets.json')); TG = {}
+D = '../v2/desk'; D2 = '../v2/desk2'; os.makedirs('a', exist_ok=True); os.makedirs('a3', exist_ok=True)
+pages = ['dashboard','wallet','orders-v3','dca-stats','dca-lab','trading','portfolio','tpsl','user-stats','alerts','filters','blacklist','plans','docs','profile']
+VIEW = {}
+meta = {}; tg = json.load(open(f'{D2}/targets.json')); TG = {}
 for p in pages:
-    v = Image.open(f'{D}/{VIEW.get(p, p + "_view")}.png').convert('RGB')
+    v = Image.open(f'{D2}/{p}_view.png').convert('RGB')
     v.crop((0, 0, 354, 1500)).save(f'a/{p}_side.jpg', quality=92)
     v.crop((354, 0, 2400, 104)).save(f'a/{p}_head.jpg', quality=92)
     if p == 'docs':
@@ -14,8 +14,8 @@ for p in pages:
         dv = Image.open(f'{D}/docs_view.png').convert('RGB'); dv.crop((30, 592, 450, 1404)).save('a/docs_toc.jpg', quality=92)
         meta[p] = {'h': m.height / 1.5 + 69, 'cards': [], 'heads': json.load(open(f'{D}/docs_heads.json'))['heads']}
     else:
-        m = Image.open(f'{D}/{p}_main.png').convert('RGB'); m.save(f'a/{p}_main.jpg', quality=88)
-        cards = json.load(open(f'{D}/{p}_cards.json'))['cards']
+        m = Image.open(f'{D2}/{p}_main.png').convert('RGB'); m.save(f'a/{p}_main.jpg', quality=88)
+        cards = json.load(open(f'{D2}/{p}_cards.json'))['cards']
         meta[p] = {'h': m.height / 1.5, 'cards': [c for c in cards if not c['t'].startswith('@keyframes')]}
     d = {}
     for b in tg.get(p, {}).get('btns', []): d.setdefault(b['t'], {k: b[k] for k in 'xywh'})
@@ -62,8 +62,8 @@ for i, (cid, title, text) in enumerate(ch):
         w = w.replace('<<', '«').replace('>>', '»')
         m = re.match(r'^([«"(]*)(.*?)([.,!?:;»")—]*)$', w); pre, core, p = m.group(1), m.group(2), m.group(3)
         if not any(x.isalnum() for x in core): continue
-        ML = {k.lower(): v for k, v in MAP.items()}
-        disp = ML.get(core.lower(), unicodedata.normalize('NFC', core.replace('́', '')))
+        ML = {k.lower(): v for k, v in MAP.items() if k != 'ПРО'}
+        disp = MAP['ПРО'] if core == 'ПРО' else ML.get(core.lower(), unicodedata.normalize('NFC', core.replace('́', '')))
         words.append({'w': pre.replace('«', '').replace('"', '') + disp, 'p': p.replace('»', '').replace('"', ''), 's': round(start + a0, 3), 'e': round(start + min(a1, dur), 3), 'c': i})
     chapters.append({'id': cid, 'title': title, 'card': card, 'start': start, 'end': start + dur})
     t = start + dur + GAP
