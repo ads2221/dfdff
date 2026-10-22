@@ -7,4 +7,7 @@
 - `thumbnail/` — English thumbnails A / B / C (1920×1080 and 1280×720).
 - `source/` — data files for the shorts. The engine `short.js` is shared with the Russian version (`../shorts-emerald/source/`) and switches language via `window.LANG`.
 
-The full English review is in progress.
+## Full review
+`full-review/dca_solana_trade_review_en_1080p.mp4` — the full PC review in English: 1920×1080, 6:24, 13 chapters, Emerald theme, voiced by Liam.
+
+The site's built-in English translation is incomplete, and the Telegram mini app is Russian-only. During capture, the missing strings are swapped in from `scripts/capture/panel_en_extra.json` and `tma_en_dict.json`, so every screen in the video is in English. The "Archive DCA" section is hidden, as in the Russian version.
