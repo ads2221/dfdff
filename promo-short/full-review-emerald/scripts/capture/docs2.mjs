@@ -1,0 +1,21 @@
+import { chromium } from '/opt/node-tools/node_modules/playwright/index.mjs';
+import fs from 'node:fs';
+const OUT = 'v2/desk';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1364, height: 936 }, deviceScaleFactor: 1.5, storageState: 'state.json' });
+await ctx.addInitScript(() => { try { localStorage.setItem('ui_theme', 'emerald'); } catch (e) {} });
+const p = await ctx.newPage();
+await p.goto('https://jupiter-dca-bot.online/docs?embed=1', { waitUntil: 'commit', timeout: 90000 }).catch(() => {});
+await p.waitForTimeout(8000);
+const H = await p.evaluate(() => document.documentElement.scrollHeight);
+for (let y = 0; y < H; y += 700) { await p.evaluate(y => scrollTo(0, y), y); await p.waitForTimeout(60); }
+await p.evaluate(() => scrollTo(0, 0)); await p.waitForTimeout(1500);
+fs.writeFileSync(`${OUT}/docs_full.txt`, await p.evaluate(() => document.body.innerText));
+const heads = await p.evaluate(() => [...document.querySelectorAll('h1,h2,h3')].map(h => ({ t: h.innerText.trim().slice(0, 70), tag: h.tagName, y: Math.round(h.getBoundingClientRect().top + scrollY) })));
+const fixed = await p.evaluate(() => [...document.querySelectorAll('body *')].filter(e => ['fixed', 'sticky'].includes(getComputedStyle(e).position)).map(e => { const r = e.getBoundingClientRect(); return [e.tagName, String(e.className).slice(0, 30), Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]; }));
+fs.writeFileSync(`${OUT}/docs_heads.json`, JSON.stringify({ H, heads, fixed }));
+await p.screenshot({ path: `${OUT}/docs_view.png` });
+await p.evaluate(() => document.querySelectorAll('body *').forEach(e => { if (['fixed', 'sticky'].includes(getComputedStyle(e).position)) e.style.visibility = 'hidden'; }));
+await p.screenshot({ path: `${OUT}/docs_page.png`, fullPage: true });
+console.log('H', H, 'heads', heads.length, 'fixed', JSON.stringify(fixed));
+await b.close();

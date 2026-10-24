@@ -1,0 +1,68 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#060608}
+body{font-family:'Space Grotesk',sans-serif;color:#fff;position:relative}
+.abs{position:absolute}
+.big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:-2px}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+#bg{position:absolute;inset:0;background:
+  radial-gradient(900px 700px at 18% 30%,rgba(245,180,0,.35),transparent 60%),
+  radial-gradient(1000px 800px at 88% 75%,rgba(123,92,255,.42),transparent 62%),
+  radial-gradient(600px 500px at 60% 10%,rgba(34,211,122,.12),transparent 60%),#060608}
+#grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at 60% 55%,#000 30%,transparent 75%)}
+.streak{position:absolute;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,#F5B400,transparent);opacity:.7}
+.win{border-radius:18px;overflow:hidden;background:#0d0d10;box-shadow:0 0 0 2px rgba(255,255,255,.12),0 50px 120px rgba(0,0,0,.8),0 0 120px rgba(245,180,0,.25)}
+.bar{height:44px;background:#18181d;display:flex;align-items:center;gap:10px;padding:0 18px}
+.bar i{width:14px;height:14px;border-radius:50%;display:block}
+.url{margin-left:18px;flex:1;height:28px;border-radius:14px;background:#0e0e12;font-family:'JetBrains Mono';font-size:15px;color:#cfd;display:flex;align-items:center;padding-left:14px}
+.win img{display:block;width:100%}
+.phone{border-radius:56px;background:#0f0f12;padding:12px;box-shadow:0 0 0 3px #2c2c33,0 40px 100px rgba(0,0,0,.85),0 0 90px rgba(245,180,0,.35)}
+.phone .scr{border-radius:46px;overflow:hidden}
+.phone img{display:block;width:100%}
+.chip{display:inline-flex;align-items:center;gap:14px;padding:14px 26px;border-radius:14px;font-family:'JetBrains Mono';font-weight:700;font-size:30px;letter-spacing:2px}
+.ring{position:absolute;border:6px solid #F5B400;border-radius:18px;box-shadow:0 0 50px rgba(245,180,0,.8),inset 0 0 30px rgba(245,180,0,.3)}
+</style></head><body>
+<div id="bg"></div><div id="grid"></div>
+<div class="abs" style="left:0;top:0;width:1100px;height:1080px;background:linear-gradient(90deg,rgba(6,6,8,.92) 55%,rgba(6,6,8,0));z-index:1"></div>
+<div class="streak" style="left:-100px;top:930px;width:900px;transform:rotate(-8deg)"></div>
+<div class="streak" style="left:1100px;top:120px;width:700px;transform:rotate(-8deg);background:linear-gradient(90deg,transparent,#7B5CFF,transparent)"></div>
+
+<!-- browser (right, 3D) -->
+<div class="abs" style="left:860px;top:150px;width:1220px;perspective:2200px">
+  <div class="win" style="position:relative;transform:rotateY(-17deg) rotateX(6deg) rotateZ(-1.5deg);transform-origin:0 50%">
+    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><div class="url">jupiter-dca-bot.online/panel/orders-v3</div></div>
+    <img src="orders-v3_view.png">
+    <div class="ring" style="left:795px;top:168px;width:212px;height:142px"></div>
+    <div class="abs mono" style="left:795px;top:118px;background:#F5B400;color:#111;padding:6px 14px;border-radius:8px;font-size:20px">WIN RATE LIVE</div>
+    <svg class="abs" style="left:960px;top:262px;width:80px;height:80px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))" viewBox="0 0 24 24"><path d="M4 2.5l14.5 8.3-6.6 1.6 3.9 7.2-2.6 1.4-3.9-7.2-5.3 4.3z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+
+<!-- phone (front) -->
+<div class="abs" style="left:1500px;top:420px;width:330px;transform:rotate(6deg)">
+  <div class="phone"><div class="scr"><img src="theme_Amber.png"></div></div>
+</div>
+<!-- telegram badge -->
+<div class="abs" style="left:1405px;top:880px;display:flex;align-items:center;gap:14px;padding:12px 20px 12px 12px;border-radius:50px;background:rgba(15,25,35,.92);border:2px solid #2AABEE;box-shadow:0 0 40px rgba(42,171,238,.5)">
+  <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#37BBFE,#007DBB);display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24"><path fill="#fff" d="M21.5 3.6 2.9 10.8c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.8l3.2-15.2c.3-1.3-.5-1.9-1.9-1.5z"/></svg></div>
+  <span style="font-weight:700;font-size:28px">Mini App</span></div>
+
+<!-- left text --><div style="position:absolute;inset:0;z-index:2">
+<div class="abs" style="left:80px;top:90px">
+  <div class="chip" style="background:#F5B400;color:#111">▶ ПОЛНЫЙ ОБЗОР · 10 МИН</div>
+</div>
+<div class="abs big" style="left:72px;top:210px;font-size:128px;text-shadow:0 10px 40px rgba(0,0,0,.6)">ВСЯ<br>ПЛАТ&shy;ФОРМА</div>
+<div class="abs big" style="left:72px;top:500px;font-size:112px;background:linear-gradient(90deg,#FFD34D,#F5B400 45%,#FF9F1C);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 8px 30px rgba(245,180,0,.45))">ЗА 10 МИНУТ</div>
+<div class="abs" style="left:80px;top:690px;display:flex;align-items:center;gap:20px">
+  <svg width="74" height="74" viewBox="-110 -110 220 220"><path d="M0-105 C8-20 20-8 105 0 C20 8 8 20 0 105 C-8 20 -20 8 -105 0 C-20 -8 -8 -20 0 -105Z" fill="#F5B400"/><circle r="13" fill="#22D37A"/></svg>
+  <div style="font-weight:700;font-size:64px;letter-spacing:-1px">DCA SOLANA <span style="color:#F5B400">TRADE</span></div>
+</div>
+<div class="abs" style="left:80px;top:820px;display:flex;gap:16px">
+  <div class="chip" style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);font-size:26px">ВЕБ-ПАНЕЛЬ</div>
+  <div class="chip" style="background:rgba(123,92,255,.2);border:2px solid #7B5CFF;font-size:26px">TELEGRAM</div>
+  <div class="chip" style="background:rgba(34,211,122,.15);border:2px solid #22D37A;font-size:26px;color:#7dffb8">ТАРИФЫ</div>
+</div>
+</div></body></html>

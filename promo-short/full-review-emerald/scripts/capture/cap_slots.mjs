@@ -1,0 +1,14 @@
+import { chromium } from '/opt/node-tools/node_modules/playwright/index.mjs';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1600, height: 1000 }, deviceScaleFactor: 1.5 });
+await ctx.addInitScript(() => { try { localStorage.setItem('ui_theme', 'emerald'); } catch (e) {} });
+const p = await ctx.newPage();
+await p.goto('https://jupiter-dca-bot.online/', { waitUntil: 'commit', timeout: 90000 }).catch(() => {});
+await p.waitForTimeout(7000);
+await p.evaluate(() => document.getElementById('plans').scrollIntoView()); await p.waitForTimeout(2500);
+await p.getByText('Слот 3 · Безлимит').first().click().catch(e => console.log('noclick'));
+await p.waitForTimeout(4000);
+const r = await p.evaluate(() => { const e = document.getElementById('slot-an'); const r = e.getBoundingClientRect(); return [r.x, r.y + scrollY, r.width, r.height, e.innerText.slice(0, 200)]; });
+console.log(JSON.stringify(r));
+const el = await p.$('#slot-an'); await el.screenshot({ path: 'v2/desk/landing_slotan.png' });
+await b.close();

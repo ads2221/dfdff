@@ -1,0 +1,69 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#050806}
+body{font-family:'Space Grotesk',sans-serif;color:#fff;position:relative}
+.abs{position:absolute}
+.big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:.92;letter-spacing:-2px}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+#bg{position:absolute;inset:0;background:
+  radial-gradient(1100px 800px at 72% 60%,rgba(34,211,122,.38),transparent 62%),
+  radial-gradient(800px 600px at 10% 15%,rgba(245,180,0,.30),transparent 60%),
+  radial-gradient(700px 500px at 100% 0%,rgba(123,92,255,.25),transparent 60%),#050806}
+#grid{position:absolute;inset:0;background-image:linear-gradient(rgba(34,211,122,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,122,.07) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at 70% 60%,#000 25%,transparent 75%)}
+.win{border-radius:18px;overflow:hidden;background:#0d0d10;box-shadow:0 0 0 2px rgba(255,255,255,.12),0 50px 120px rgba(0,0,0,.8)}
+.bar{height:40px;background:#18181d;display:flex;align-items:center;gap:9px;padding:0 16px}
+.bar i{width:13px;height:13px;border-radius:50%;display:block}
+.win img{display:block;width:100%}
+.phone{border-radius:52px;background:#0f0f12;padding:11px;box-shadow:0 0 0 3px #2c2c33,0 40px 100px rgba(0,0,0,.85),0 0 90px rgba(34,211,122,.35)}
+.phone .scr{border-radius:42px;overflow:hidden}.phone img{display:block;width:100%}
+.chip{display:inline-flex;align-items:center;gap:12px;padding:14px 24px;border-radius:14px;font-family:'JetBrains Mono';font-weight:700;font-size:30px;letter-spacing:1px}
+.coin{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF3B0,#F5B400 45%,#B07800);box-shadow:0 10px 30px rgba(0,0,0,.6),inset 0 -6px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-family:Unbounded;font-weight:900;color:#7a5200}
+</style></head><body>
+<div id="bg"></div><div id="grid"></div>
+
+<!-- dimmed browser in back -->
+<div class="abs" style="left:900px;top:70px;width:1150px;perspective:2200px;opacity:.55;filter:saturate(.9)">
+  <div class="win" style="transform:rotateY(-16deg) rotateX(5deg);transform-origin:0 50%">
+    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+    <img src="dca-lab_view.png">
+  </div>
+</div>
+
+<!-- rising chart -->
+<svg class="abs" style="left:780px;top:250px" width="1140" height="760" viewBox="0 0 1140 760">
+  <defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22D37A" stop-opacity=".55"/><stop offset="1" stop-color="#22D37A" stop-opacity="0"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+  <path d="M0 700 L80 660 L150 680 L230 600 L300 620 L380 520 L450 545 L530 440 L600 470 L690 350 L760 380 L850 250 L920 280 L1010 140 L1080 160 L1140 60 L1140 760 L0 760Z" fill="url(#fill)"/>
+  <path d="M0 700 L80 660 L150 680 L230 600 L300 620 L380 520 L450 545 L530 440 L600 470 L690 350 L760 380 L850 250 L920 280 L1010 140 L1080 160 L1140 60" fill="none" stroke="#3CFF9A" stroke-width="12" stroke-linejoin="round" filter="url(#glow)"/>
+  <g font-family="JetBrains Mono" font-weight="700" font-size="22" fill="#05150c">
+   <g transform="translate(230,600)"><circle r="16" fill="#3CFF9A"/></g><g transform="translate(530,440)"><circle r="16" fill="#3CFF9A"/></g><g transform="translate(850,250)"><circle r="16" fill="#3CFF9A"/></g>
+  </g>
+  <path d="M1090 120 l50 -60 l12 72z" fill="#3CFF9A" filter="url(#glow)"/>
+</svg>
+
+<!-- phone -->
+<div class="abs" style="left:1560px;top:330px;width:300px;transform:rotate(7deg)"><div class="phone"><div class="scr"><img src="trading_view.png"></div></div></div>
+
+<!-- coins -->
+<div class="coin" style="left:1440px;top:150px;width:110px;height:110px;font-size:52px;transform:rotate(-15deg)">$</div>
+<div class="coin" style="left:1360px;top:830px;width:90px;height:90px;font-size:42px;transform:rotate(12deg)">$</div>
+<div class="coin" style="left:1780px;top:120px;width:76px;height:76px;font-size:36px">$</div>
+
+<!-- scrim -->
+<div class="abs" style="left:0;top:0;width:1150px;height:1080px;background:linear-gradient(90deg,rgba(5,8,6,.95) 55%,rgba(5,8,6,0))"></div>
+
+<!-- text -->
+<div class="abs" style="left:76px;top:70px"><div class="chip" style="background:#F5B400;color:#111">▶ ПОЛНЫЙ ОБЗОР · DCA SOLANA TRADE</div></div>
+<div class="abs big" style="left:70px;top:180px;font-size:112px;text-shadow:0 10px 40px rgba(0,0,0,.7)">СКОЛЬКО БЫ</div>
+<div class="abs big" style="left:70px;top:290px;font-size:112px;color:#F5B400;text-shadow:0 10px 40px rgba(245,180,0,.35)">ЗАРАБОТАЛ БОТ?</div>
+<div class="abs big" style="left:62px;top:430px;font-size:250px;letter-spacing:-8px;background:linear-gradient(180deg,#A6FFCF,#22D37A 55%,#0E9F55);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 0 40px rgba(34,211,122,.55)) drop-shadow(0 12px 0 rgba(0,0,0,.4))">+$566</div>
+<div class="abs mono" style="left:80px;top:700px;font-size:34px;color:#d9ffe9;letter-spacing:1px">чистыми за 30 дней на истории*</div>
+<div class="abs" style="left:80px;top:780px;display:flex;gap:16px">
+  <div class="chip" style="background:rgba(34,211,122,.16);border:2px solid #22D37A;color:#7dffb8">ПРОВЕРКА НА ИСТОРИИ</div>
+  <div class="chip" style="background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.3)">107 СДЕЛОК</div>
+</div>
+<div class="abs mono" style="left:82px;top:1020px;font-size:20px;font-weight:500;color:rgba(255,255,255,.55)">*бэктест «Лаборатории фильтров»: сделка $1000, с учётом издержек · не гарантия дохода</div>
+</body></html>

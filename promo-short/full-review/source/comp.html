@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/fonts.css">
+<style>
+:root{--y:#F5B400;--y2:#FFD34D;--v:#7B5CFF;--g:#22D37A;--r:#FF3B5C;--tg:#2AABEE}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#07070a}
+body{font-family:'Space Grotesk',Inter,sans-serif;color:#fff}
+.abs{position:absolute;left:0;top:0}
+.mono{font-family:'JetBrains Mono',monospace}
+.big{font-family:'Unbounded',sans-serif;font-weight:900;text-transform:uppercase;line-height:1;white-space:nowrap}
+#bg{position:absolute;inset:0}
+#cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#win{position:absolute;left:176px;top:30px;width:1568px;height:1020px;border-radius:14px;overflow:hidden;background:#0d0d10;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 120px rgba(0,0,0,.75),0 0 90px rgba(245,180,0,.08)}
+#bar{position:absolute;left:0;top:0;width:1568px;height:40px;background:#18181d;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.06)}
+#bar i{width:13px;height:13px;border-radius:50%;display:block}
+#url{margin-left:22px;width:760px;height:26px;border-radius:13px;background:#0e0e12;display:flex;align-items:center;gap:10px;padding:0 14px;font-family:'JetBrains Mono';font-size:14px;color:#c8c8d0}
+#tabT{margin-left:auto;font-size:13px;color:#888;font-family:'JetBrains Mono'}
+#content{position:absolute;left:0;top:40px;width:1600px;height:1000px;transform:scale(.98);transform-origin:0 0;overflow:hidden;background:#0b0b0d}
+.pp{position:absolute;left:0;top:0;width:1600px;height:1000px;overflow:hidden;display:none}
+.pp img{position:absolute;display:block}
+#loadbar{position:absolute;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--y),var(--y2));box-shadow:0 0 12px var(--y);z-index:40}
+#spot{position:absolute;border-radius:10px;border:3px solid var(--y);box-shadow:0 0 0 4000px rgba(4,4,8,.55),0 0 40px rgba(245,180,0,.55);z-index:30;pointer-events:none}
+#spotLbl{position:absolute;z-index:31;font-family:'JetBrains Mono';font-weight:700;font-size:20px;letter-spacing:2px;padding:9px 16px;border-radius:8px;background:var(--y);color:#111;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#cursor{position:absolute;z-index:60;width:34px;height:34px;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+#ripple{position:absolute;z-index:59;width:60px;height:60px;border-radius:50%;border:3px solid var(--y);pointer-events:none}
+#wheel{position:absolute;z-index:58;width:26px;height:40px;border-radius:13px;border:2px solid rgba(255,255,255,.85);pointer-events:none}
+#wheel b{position:absolute;left:10px;width:3px;height:8px;border-radius:2px;background:#fff}
+/* telegram desktop */
+#tg{position:absolute;inset:0;display:none;background:#0e1621;z-index:20}
+#tgList{position:absolute;left:0;top:0;width:360px;height:1000px;background:#17212b;border-right:1px solid #0b1219}
+.tgItem{position:absolute;left:10px;width:340px;height:72px;border-radius:10px;display:flex;align-items:center;gap:14px;padding:0 12px}
+.sk{height:12px;border-radius:6px;background:#26323f}
+#tgChatHead{position:absolute;left:360px;top:0;width:1240px;height:64px;background:#17212b;display:flex;align-items:center;gap:16px;padding:0 24px}
+.bub{position:absolute;background:#182533;border-radius:16px 16px 16px 4px;padding:14px 18px;font-size:18px;line-height:1.45;max-width:520px}
+#tgInput{position:absolute;left:360px;bottom:0;width:1240px;height:64px;background:#17212b;display:flex;align-items:center;gap:14px;padding:0 18px}
+#openBtn{height:40px;padding:0 20px;border-radius:10px;background:var(--tg);display:flex;align-items:center;font-weight:700;font-size:17px}
+#mini{position:absolute;width:420px;height:850px;border-radius:12px;overflow:hidden;background:#0e0e12;box-shadow:0 30px 90px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.1);z-index:25;display:none}
+#miniBar{position:absolute;left:0;top:0;width:420px;height:40px;background:#17212b;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:14px;z-index:9}
+#miniBody{position:absolute;left:0;top:40px;width:420px;height:810px;overflow:hidden}
+.mp{position:absolute;left:0;top:0;width:420px;height:810px;overflow:hidden;display:none}
+.mp img{position:absolute;left:0;width:420px}
+.mco{position:absolute;z-index:26;border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px rgba(245,180,0,.5),0 0 50px rgba(245,180,0,.3),0 30px 80px rgba(0,0,0,.7);display:none}
+.mco img{display:block;width:100%}
+/* overlays (screen space) */
+#chapRail{position:absolute;left:28px;top:150px;width:120px}
+.cr{display:flex;align-items:center;gap:10px;height:52px;font-family:'JetBrains Mono';font-size:14px;color:#555}
+.cr i{display:block;width:10px;height:10px;border-radius:50%;background:#333;flex:none}
+#caps{position:absolute;left:260px;right:260px;top:952px;text-align:center;z-index:80}
+#capsIn{display:inline-block;padding:10px 26px;border-radius:14px;background:rgba(8,8,12,.78);border:1px solid rgba(255,255,255,.1);font-size:34px;font-weight:600;line-height:1.3;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#capsIn span{color:#e8e8ee}
+#capsIn span.on{color:var(--y)}
+#capsIn span.off{color:#8a8a96}
+#chapCard{position:absolute;inset:0;z-index:90;display:none}
+#overlay{position:absolute;inset:0;z-index:85;pointer-events:none}
+.glass{background:linear-gradient(160deg,rgba(30,30,40,.92),rgba(14,14,20,.92));border:1px solid rgba(255,255,255,.14);border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.6)}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:95;pointer-events:none}
+#grain{position:absolute;inset:-60px;opacity:.025;mix-blend-mode:overlay;pointer-events:none;z-index:96}
+#prog{position:absolute;left:0;bottom:0;height:5px;background:linear-gradient(90deg,var(--y),var(--y2));z-index:97}
+</style></head><body>
+<canvas id="bg" width="1920" height="1080"></canvas>
+<div id="chapRail"></div>
+<div id="cam">
+ <div id="win">
+  <div id="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
+   <div id="url"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M6 10V8a6 6 0 1 1 12 0v2h1v12H5V10h1zm2 0h8V8a4 4 0 1 0-8 0v2z" fill="#22D37A"/></svg><span id="urlT">jupiter-dca-bot.online</span></div>
+   <div id="tabT">DCA SOLANA TRADE</div></div>
+  <div id="content">
+   <div id="pages"></div>
+   <div id="tg">
+     <div id="tgList">
+       <div style="position:absolute;left:16px;top:14px;width:328px;height:38px;border-radius:19px;background:#242f3d;color:#6d7f8f;font-size:16px;display:flex;align-items:center;padding-left:18px">Поиск</div>
+       <div class="tgItem" style="top:70px;background:#2b5278"><img src="a3/bot_avatar.jpg" style="width:52px;height:52px;border-radius:50%"><div><div style="font-weight:700;font-size:17px">DCA SOLANA TRADE | V3</div><div style="font-size:15px;color:#a9c4de">бот · мини-приложение</div></div></div>
+       <div id="tgSk"></div>
+     </div>
+     <div id="tgChatHead"><img src="a3/bot_avatar.jpg" style="width:44px;height:44px;border-radius:50%"><div><div style="font-weight:700;font-size:18px">DCA SOLANA TRADE | V3</div><div style="font-size:14px;color:#7d8b99">бот</div></div></div>
+     <div class="bub" id="b1" style="right:30px;left:auto;top:620px;background:#2b5278;border-radius:16px 16px 4px 16px">/start</div>
+     <div class="bub" id="b2" style="left:390px;top:690px"><b>DCA SOLANA TRADE V3</b><br>Торговля по DCA-ордерам на Solana. Откройте мини-приложение, чтобы управлять ботом, смотреть статистику и настраивать фильтры.</div>
+     <div id="tgInput"><div id="openBtn">Открыть</div><div style="flex:1;height:40px;border-radius:20px;background:#242f3d;color:#6d7f8f;font-size:16px;display:flex;align-items:center;padding-left:18px">Сообщение</div></div>
+     <div id="mini"><div id="miniBar"><span style="color:#6ab2f2">✕ Закрыть</span><b style="font-size:14px">DCA SOLANA TRADE | V3</b><span style="color:#6ab2f2">⋯</span></div><div id="miniBody"></div></div>
+   </div>
+   <div id="loadbar"></div>
+   <div id="spot"></div><div id="spotLbl"></div>
+   <div id="wheel"><b></b></div>
+   <div id="ripple"></div>
+   <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2.5l14.5 8.3-6.6 1.6 3.9 7.2-2.6 1.4-3.9-7.2-5.3 4.3z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+  </div>
+ </div>
+</div>
+<div id="overlay"></div>
+<div id="caps"><div id="capsIn"></div></div>
+<div id="chapCard"></div>
+<canvas id="grain" width="700" height="420"></canvas>
+<div id="flash"></div>
+<div id="prog"></div>
+<script src="data.js"></script>
+<script src="targets.js"></script>
+<script src="shots.js"></script>
+<script src="engine.js"></script>
+</body></html>
